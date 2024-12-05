@@ -14,6 +14,7 @@ class Transaction(models.Model):
     description = models.TextField(blank=True, null=True)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    
 
     def __str__(self) -> str:
         return f"{self.transaction_type} - {self.amount} ({self.category})"
