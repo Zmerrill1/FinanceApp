@@ -5,8 +5,29 @@ from .models import Account
 from .models import BudgetCategory
 from .models import Transaction
 
-admin.site.register(Budget)
-admin.site.register(BudgetItem)
-admin.site.register(Account)
-admin.site.register(BudgetCategory)
-admin.site.register(Transaction)
+@admin.register(Budget)
+class BudgetAdmin(admin.ModelAdmin):
+    list_display = ('name', 'total_amount')
+    search_fields = ('name', 'total_amount')
+
+@admin.register(BudgetItem)
+class BudgetItemAdmin(admin.ModelAdmin):
+    list_display = ('budget', 'budget_category', 'planned_amount', 'spent_amount')
+    search_fields = ('budget', 'budget_category')
+
+@admin.register(Account)
+class AccountAdmin(admin.ModelAdmin):
+    list_display = ('name', 'balance', 'account_type')
+    search_fields = ('name', 'account_type')
+
+
+@admin.register(BudgetCategory)
+class BudgetCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')
+
+
+@admin.register(Transaction)
+class TransactionAdmin(admin.ModelAdmin):
+    list_display = ('date', 'transaction_type', 'account', 'description', 'amount', 'budget_category')
+    search_fields = ('date', 'transaction_type', 'account', 'budget_category')
+

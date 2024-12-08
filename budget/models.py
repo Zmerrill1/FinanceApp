@@ -1,9 +1,18 @@
 from django.db import models
+from django.utils.timezone import now
+from django.contrib.auth.models import User
 
 class Account(models.Model):
+    ACCOUNT_TYPE = {
+        ('CHECKING', 'Checking'),
+        ('SAVINGS', 'Savings'),
+        ('CREDIT CARD', 'Credit Card'),
+    }
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) #temporarily making the field nullable. 
     name = models.CharField(max_length=100)
     balance = models.DecimalField(max_digits=10, decimal_places=2)
-    account_type = models.CharField(max_length = 50) #i.e, "checking" or "savings" or "credit card", etc.
+    account_type = models.CharField(max_length = 50, choices=ACCOUNT_TYPE)
 
     def __str__(self) -> str:
         return self.name
@@ -41,11 +50,11 @@ class Transaction(models.Model):
     ]
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateField(default=now)
     transaction_type = models.CharField(max_length=7, choices=TRANSACTION_TYPE)
     description = models.TextField(blank=True, null=True)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    budget_category = models.ForeignKey(BudgetCategory, on_delete=models.CASCADE)
+    budget_category = models.ForeignKey(BudgetCategory, on_delete=models.CASCADE, blank=True, null=True)
 
 
     def __str__(self) -> str:
