@@ -7,7 +7,7 @@ from .models import Transaction
 
 @admin.register(Budget)
 class BudgetAdmin(admin.ModelAdmin):
-    list_display = ('name', 'total_amount')
+    list_display = ('name', 'total_amount', 'start_date', 'end_date')
     search_fields = ('name', 'total_amount')
 
 @admin.register(BudgetItem)
@@ -19,7 +19,7 @@ class BudgetItemAdmin(admin.ModelAdmin):
 class AccountAdmin(admin.ModelAdmin):
     list_display = ('name', 'balance', 'account_type')
     search_fields = ('name', 'account_type')
-
+    autocomplete_fields = ['user']
 
 @admin.register(BudgetCategory)
 class BudgetCategoryAdmin(admin.ModelAdmin):
@@ -30,4 +30,4 @@ class BudgetCategoryAdmin(admin.ModelAdmin):
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('date', 'transaction_type', 'account', 'description', 'amount', 'budget_category')
     search_fields = ('date', 'transaction_type', 'account', 'budget_category')
-
+    list_filter = ('date', 'transaction_type', 'account', 'budget_category')
