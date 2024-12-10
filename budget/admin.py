@@ -2,13 +2,12 @@ from django.contrib import admin
 from .models import Budget
 from .models import BudgetItem
 from .models import Account
-from .models import BudgetCategory
 from .models import Transaction
 
 @admin.register(Budget)
 class BudgetAdmin(admin.ModelAdmin):
-    list_display = ('name', 'total_amount', 'start_date', 'end_date')
-    search_fields = ('name', 'total_amount')
+    list_display = ('name', 'start_date', 'end_date')
+    search_fields = ('name', 'start_date', 'end_date')
 
 @admin.register(BudgetItem)
 class BudgetItemAdmin(admin.ModelAdmin):
@@ -21,13 +20,9 @@ class AccountAdmin(admin.ModelAdmin):
     search_fields = ('name', 'account_type')
     autocomplete_fields = ['user']
 
-@admin.register(BudgetCategory)
-class BudgetCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
-
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('date', 'transaction_type', 'account', 'description', 'amount', 'budget_category')
-    search_fields = ('date', 'transaction_type', 'account', 'budget_category')
-    list_filter = ('date', 'transaction_type', 'account', 'budget_category')
+    list_display = ('date', 'transaction_type', 'account', 'description', 'amount', 'budget_item')
+    search_fields = ('date', 'transaction_type', 'account', 'budget_ite ')
+    list_filter = ('date', 'transaction_type', 'account', 'budget_item')
