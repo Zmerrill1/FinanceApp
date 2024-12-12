@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction List{% endblock %}
+
+{% block content %}
+    <h1>Transaction List</h1>
+    <a href="{% url 'add_transaction' %}">Add New Transaction</a>
+    <ul>
+        {% for transaction in transactions %}
+            <li>
+                {{ transaction.amount }} - {{ transaction.category }} - {{ transaction.date }}
+                <a href="{% url 'edit_transaction' transaction.id %}">Edit</a>
+                <a href="{% url 'delete_transaction' transaction.id %}" onclick="return confirm('Are you sure?')">Delete</a>
+            </li>
+        {% empty %}
+            <li>No transactions found.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
