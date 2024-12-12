@@ -37,8 +37,8 @@ def upload_csv(request):
 
             Transaction.objects.bulk_create(transactions)
             messages.success(request, f'CSV files uploaded and processed {len(transactions)} successfully')
-    
-    return render(request, 'upload.html', {'form': form}) 
+
+    return render(request, 'upload.html', {'form': form})
 
 def add_transaction(request):
     if request.method == 'POST':
@@ -63,7 +63,7 @@ def edit_transaction(request, transaction_id):
             return redirect('transaction_list')
     else:
          form = TransactionForm(instance=transaction)
-          
+
     return render(request, 'edit_transaction.html', {'form': form, 'transaction': transaction})
 
 def delete_transaction(request, transaction_id):
