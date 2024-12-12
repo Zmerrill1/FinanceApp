@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction List</title>
-</head>
-<body>
+{% extends "base.hmtl" %}
+
+{% block title %}Transaction List{% endblock %}
+
+{% block content %}
     <h1>Transaction List</h1>
     <a href="{% url 'add_transaction' %}">Add New Transaction</a>
     <ul>
@@ -19,5 +16,4 @@
             <li>No transactions found.</li>
         {% endfor %}
     </ul>
-</body>
-</html>
+{% endblock %}
