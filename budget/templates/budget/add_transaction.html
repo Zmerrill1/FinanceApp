@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Transaction</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Add New Transaction{% endblock %}
+
+{% block content %}
     <h1>Add New Transaction</h1>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}  <!-- Renders the form fields as paragraphs -->
+        {{ form.as_p }}
         <button type="submit">Add Transaction</button>
     </form>
     <a href="{% url 'transaction_list' %}">Back to Transaction List</a>
-</body>
-</html>
+{% endblock %}
