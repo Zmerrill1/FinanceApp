@@ -4,15 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('budget', '0003_alter_budgetitem_budget_category_and_more'),
+        ("budget", "0003_alter_budgetitem_budget_category_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='account',
-            name='account_type',
-            field=models.CharField(choices=[('CHECKING', 'Checking'), ('CREDIT CARD', 'Credit Card'), ('SAVINGS', 'Savings')], max_length=50),
+            model_name="account",
+            name="account_type",
+            field=models.CharField(
+                choices=[
+                    ("CHECKING", "Checking"),
+                    ("CREDIT CARD", "Credit Card"),
+                    ("SAVINGS", "Savings"),
+                ],
+                max_length=50,
+            ),
         ),
     ]

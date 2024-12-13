@@ -7,31 +7,47 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('budget', '0001_initial'),
+        ("budget", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='account',
-            name='user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="account",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='account',
-            name='account_type',
-            field=models.CharField(choices=[('SAVINGS', 'Savings'), ('CHECKING', 'Checking'), ('CREDIT CARD', 'Credit Card')], max_length=50),
+            model_name="account",
+            name="account_type",
+            field=models.CharField(
+                choices=[
+                    ("SAVINGS", "Savings"),
+                    ("CHECKING", "Checking"),
+                    ("CREDIT CARD", "Credit Card"),
+                ],
+                max_length=50,
+            ),
         ),
         migrations.AlterField(
-            model_name='transaction',
-            name='budget_category',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='budget.budgetcategory'),
+            model_name="transaction",
+            name="budget_category",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="budget.budgetcategory",
+            ),
         ),
         migrations.AlterField(
-            model_name='transaction',
-            name='date',
+            model_name="transaction",
+            name="date",
             field=models.DateField(default=django.utils.timezone.now),
         ),
     ]

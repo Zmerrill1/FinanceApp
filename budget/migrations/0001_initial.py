@@ -5,60 +5,131 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Account',
+            name="Account",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('balance', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('account_type', models.CharField(max_length=50)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("balance", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("account_type", models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='Budget',
+            name="Budget",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('total_amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("total_amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("start_date", models.DateField()),
+                ("end_date", models.DateField()),
             ],
         ),
         migrations.CreateModel(
-            name='BudgetCategory',
+            name="BudgetCategory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
-                ('description', models.TextField(blank=True, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, unique=True)),
+                ("description", models.TextField(blank=True, null=True)),
             ],
         ),
         migrations.CreateModel(
-            name='BudgetItem',
+            name="BudgetItem",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('planned_amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('spent_amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('budget', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='budget.budget')),
-                ('budget_category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='budget.budgetcategory')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "planned_amount",
+                    models.DecimalField(decimal_places=2, max_digits=10),
+                ),
+                ("spent_amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "budget",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="items",
+                        to="budget.budget",
+                    ),
+                ),
+                (
+                    "budget_category",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="budget.budgetcategory",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Transaction',
+            name="Transaction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('date', models.DateTimeField(auto_now_add=True)),
-                ('transaction_type', models.CharField(choices=[('INCOME', 'Income'), ('EXPENSE', 'Expense')], max_length=7)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('account', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='budget.account')),
-                ('budget_category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='budget.budgetcategory')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("date", models.DateTimeField(auto_now_add=True)),
+                (
+                    "transaction_type",
+                    models.CharField(
+                        choices=[("INCOME", "Income"), ("EXPENSE", "Expense")],
+                        max_length=7,
+                    ),
+                ),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "account",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="budget.account"
+                    ),
+                ),
+                (
+                    "budget_category",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="budget.budgetcategory",
+                    ),
+                ),
             ],
         ),
     ]

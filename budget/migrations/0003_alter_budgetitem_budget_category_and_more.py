@@ -5,41 +5,52 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('budget', '0002_account_user_alter_account_account_type_and_more'),
+        ("budget", "0002_account_user_alter_account_account_type_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='budgetitem',
-            name='budget_category',
+            model_name="budgetitem",
+            name="budget_category",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.RemoveField(
-            model_name='transaction',
-            name='budget_category',
+            model_name="transaction",
+            name="budget_category",
         ),
         migrations.RemoveField(
-            model_name='budget',
-            name='total_amount',
+            model_name="budget",
+            name="total_amount",
         ),
         migrations.AddField(
-            model_name='budgetitem',
-            name='description',
+            model_name="budgetitem",
+            name="description",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='transaction',
-            name='budget_item',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='budget.budgetitem'),
+            model_name="transaction",
+            name="budget_item",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="budget.budgetitem",
+            ),
         ),
         migrations.AlterField(
-            model_name='account',
-            name='account_type',
-            field=models.CharField(choices=[('CHECKING', 'Checking'), ('SAVINGS', 'Savings'), ('CREDIT CARD', 'Credit Card')], max_length=50),
+            model_name="account",
+            name="account_type",
+            field=models.CharField(
+                choices=[
+                    ("CHECKING", "Checking"),
+                    ("SAVINGS", "Savings"),
+                    ("CREDIT CARD", "Credit Card"),
+                ],
+                max_length=50,
+            ),
         ),
         migrations.DeleteModel(
-            name='BudgetCategory',
+            name="BudgetCategory",
         ),
     ]
