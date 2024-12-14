@@ -37,13 +37,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "debug_toolbar",
     "account",
     "budget",
-    "debug_toolbar",
 ]
 
 INTERNAL_IPS = [
-    "127.0.01",
+    "127.0.0.1",
 ]
 
 MIDDLEWARE = [
