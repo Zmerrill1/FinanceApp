@@ -11,6 +11,12 @@ wheels = [
 ]
 
 [[package]]
+name = "dependency"
+version = "0.0.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/f2/5acb663164b83d557b63b8fb0e0e19416f96eba4398c21273b7302d486f2/dependency-0.0.3.tar.gz", hash = "sha256:41c26885d28a71a07e4605cdfa564b73a49fe9b29a4479207e14c7fda0e39d64", size = 3422 }
+
+[[package]]
 name = "django"
 version = "5.1.4"
 source = { registry = "https://pypi.org/simple" }
@@ -29,12 +35,14 @@ name = "financeapp"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "dependency" },
     { name = "django" },
     { name = "python-decouple" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "dependency", specifier = ">=0.0.3" },
     { name = "django", specifier = ">=5.1.4" },
     { name = "python-decouple", specifier = ">=3.8" },
 ]

@@ -1,6 +1,6 @@
 import csv
 import io
-from datetime import datetime
+from datetime import date, datetime
 
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
@@ -10,12 +10,13 @@ from .forms import CSVUploadForm, TransactionForm
 from .models import Transaction
 
 
-def parse_date(date_str):
+def parse_date(date_str: str) -> date:
     return datetime.strptime(date_str, "%m/%d/%Y").date()
 
 
 # @login_required
 def upload_csv(request):
+    form = CSVUploadForm()
     if request.method == "POST":
         form = CSVUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -24,17 +25,18 @@ def upload_csv(request):
 
             csv_data = csv_file.read().decode("utf-8")
             io_string = io.StringIO(csv_data)
-            reader = csv.DictReader(io_string, delimiter=";")
+            reader = csv.DictReader(io_string, delimiter=",")
 
-            # fetch existing transactions to avoid duplicates
-            existing_transactions = Transaction.objects.filter(
-                account=account
-            ).select_related("account")
+            # existing_transactions = Transaction.objects.filter(
+            #     account=account
+            # ).select_related("account")
 
-            existing_transactions_set = set(
-                (transaction.date, transaction.description, str(transaction.amount))
-                for transaction in existing_transactions
-            )
+            existing_transactions = {
+                (transaction[0], transaction[1], str(transaction[2]))
+                for transaction in Transaction.objects.filter(
+                    account=account
+                ).values_list("date", "description", "amount")
+            }
             transactions = []
 
             for row in reader:
@@ -45,16 +47,17 @@ def upload_csv(request):
                     row["Amount"],
                 )
 
-                if transaction_identifier not in existing_transactions_set:
-                    transactions.append(
-                        Transaction(
-                            account=account,
-                            date=transaction_date,
-                            description=row["Description"],
-                            amount=row["Amount"],
-                        )
+                if transaction_identifier in existing_transactions:
+                    continue
+                transactions.append(
+                    Transaction(
+                        account=account,
+                        date=transaction_date,
+                        description=row["Description"],
+                        amount=row["Amount"],
                     )
-                existing_transactions_set.add(transaction_identifier)
+                )
+                existing_transactions.add(transaction_identifier)
 
             Transaction.objects.bulk_create(transactions)
             messages.success(
