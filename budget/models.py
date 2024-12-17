@@ -58,3 +58,20 @@ class Transaction(models.Model):
 
     def __str__(self) -> str:
         return f"{self.transaction_type} - {self.amount} ({self.budget_item})"
+
+
+class UploadedFile(models.Model):
+    file_name = models.CharField(max_length=255)
+    file_hash = models.CharField(max_length=64, unique=True)
+    upload_date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="uploaded_files",
+        null=True,
+        blank=True,
+    )  # temporarily making this field nullable
+
+    def __str__(self) -> str:
+        user_display = self.user.username if self.user else "Unknown User"
+        return f"{self.file_name} uploaded by {user_display}"
