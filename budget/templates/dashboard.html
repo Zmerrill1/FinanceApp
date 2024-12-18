@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="summary">
+    <h3>Total Income: {{ total_income }}</h3>
+    <h3>Total Expenses: {{ total_expenses }}</h3>
+</div>
+
+<h2>Recent Transactions</h2>
+<ul>
+    {% for transaction in recent_transactions %}
+        <li>{{ transaction.date }} - {{ transaction.category.name }}: {{ transaction.amount }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Spending by Category</h2>
+<canvas id="categoryChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const categoryData = {
+        labels: [
+            {% for entry in category_spending %}
+                "{{ entry.category__name }}",
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Spending by Category',
+            data: [
+                {% for entry in category_spending %}
+                    {{ entry.total_spent }},
+                {% endfor %}
+            ],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: categoryData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

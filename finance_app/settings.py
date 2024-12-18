@@ -18,9 +18,10 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / "finance_app/static",
 ]
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -32,6 +33,8 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = []
+
+# config('ALLOWED_HOSTS', cast=Csv())
 
 
 # Application definition
@@ -45,7 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "debug_toolbar",
     "tailwind",
-    "theme" "account",
+    "account",
     "budget",
 ]
 
@@ -71,7 +74,7 @@ ROOT_URLCONF = "finance_app.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [Path(BASE_DIR) / "budget" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

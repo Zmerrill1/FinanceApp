@@ -4,9 +4,10 @@ import io
 from datetime import date, datetime
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
-# from django.contrib.auth.decorators import login_required
 from .forms import CSVUploadForm, TransactionForm
 from .models import Transaction, UploadedFile
 
@@ -39,7 +40,7 @@ def calculate_file_hash(file) -> str:
     return hasher.hexdigest()
 
 
-# @login_required
+@login_required
 def upload_csv(request):
     form = CSVUploadForm()
     if request.method == "POST":
@@ -88,6 +89,7 @@ def upload_csv(request):
     return render(request, "upload.html", {"form": form})
 
 
+@login_required
 def add_transaction(request):
     if request.method == "POST":
         form = TransactionForm(request.POST)
@@ -101,6 +103,7 @@ def add_transaction(request):
     return render(request, "add_transaction.html", {"form": form})
 
 
+@login_required
 def edit_transaction(request, transaction_id):
     transaction = get_object_or_404(Transaction, id=transaction_id)
 
@@ -117,12 +120,42 @@ def edit_transaction(request, transaction_id):
     )
 
 
+@login_required
 def delete_transaction(request, transaction_id):
     transaction = get_object_or_404(Transaction, id=transaction_id)
     transaction.delete()
     return redirect("transaction_list")
 
 
+@login_required
 def transaction_list(request):
     transactions = Transaction.objects.all()
     return render(request, "transaction_list.html", {"transactions": transactions})
+
+
+def dashboard(request):
+    recent_transactions = Transaction.objects.order_by("-date")[:5]
+
+    category_spending = (
+        Transaction.objects.values("category__name")
+        .annotate(total_spent=Sum("amount"))
+        .order_by("-total_spent")
+    )
+
+    total_income = (
+        Transaction.objects.filter(amount__gt=0).aggregate(Sum("amount"))["amount__sum"]
+        or 0
+    )
+    total_expenses = (
+        Transaction.objects.filter(amount__lt=0).aggregate(Sum("amount"))["amount__sum"]
+        or 0
+    )
+
+    context = {
+        "recent_transactions": recent_transactions,
+        "category_spending": category_spending,
+        "total_income": total_income,
+        "total_expenses": total_expenses,
+    }
+
+    return render(request, "dashboard.html", context)
