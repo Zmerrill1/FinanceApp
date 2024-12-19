@@ -5,7 +5,7 @@ from datetime import date, datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Case, DecimalField, F, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CSVUploadForm, TransactionForm
@@ -137,19 +137,29 @@ def dashboard(request):
     recent_transactions = Transaction.objects.order_by("-date")[:5]
 
     category_spending = (
-        Transaction.objects.values("category__name")
+        Transaction.objects.values("budget_item")
         .annotate(total_spent=Sum("amount"))
         .order_by("-total_spent")
     )
 
-    total_income = (
-        Transaction.objects.filter(amount__gt=0).aggregate(Sum("amount"))["amount__sum"]
-        or 0
+    result = Transaction.objects.aggregate(
+        total_income=Sum(
+            Case(
+                When(amount__gt=0, then=F("amount")),
+                default=Value(0, output_field=DecimalField()),
+            ),
+            output_field=DecimalField(),
+        ),
+        total_expenses=Sum(
+            Case(
+                When(amount__lt=0, then=F("amount")),
+                default=Value(0, output_field=DecimalField()),
+            ),
+            output_field=DecimalField(),
+        ),
     )
-    total_expenses = (
-        Transaction.objects.filter(amount__lt=0).aggregate(Sum("amount"))["amount__sum"]
-        or 0
-    )
+    total_income = result["total_income"] or 0
+    total_expenses = result["total_expenses"] or 0
 
     context = {
         "recent_transactions": recent_transactions,

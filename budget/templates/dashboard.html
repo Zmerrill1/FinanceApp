@@ -1,22 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Dashboard</h1>
+<div class="container mx-auto py-6">
+    <!-- Dashboard Heading -->
+    <h1 class="text-3xl font-bold text-center mb-6">Dashboard</h1>
 
-<div class="summary">
-    <h3>Total Income: {{ total_income }}</h3>
-    <h3>Total Expenses: {{ total_expenses }}</h3>
+    <!-- Summary Section -->
+    <div class="summary grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+        <div class="p-4 bg-green-100 border border-green-300 rounded-lg shadow">
+            <h3 class="text-lg font-semibold text-green-700">Total Income:</h3>
+            <p class="text-xl font-bold">{{ total_income }}</p>
+        </div>
+        <div class="p-4 bg-red-100 border border-red-300 rounded-lg shadow">
+            <h3 class="text-lg font-semibold text-red-700">Total Expenses:</h3>
+            <p class="text-xl font-bold">{{ total_expenses }}</p>
+        </div>
+    </div>
+
+    <!-- Recent Transactions Section -->
+    <h2 class="text-2xl font-semibold mb-4">Recent Transactions</h2>
+    <ul class="divide-y divide-gray-200 border border-gray-300 rounded-lg overflow-hidden mb-8">
+        {% for transaction in recent_transactions %}
+        <li class="p-4 hover:bg-gray-100 flex justify-between items-center">
+            <span class="font-medium">{{ transaction.date }}</span>
+            <span>{{ transaction.category.name }}</span>
+            <span class="font-bold">{{ transaction.amount }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Spending by Category Section -->
+    <h2 class="text-2xl font-semibold mb-4">Spending by Category</h2>
+    <div class="bg-white p-4 border border-gray-300 rounded-lg shadow">
+        <canvas id="categoryChart" class="w-full"></canvas>
+    </div>
 </div>
-
-<h2>Recent Transactions</h2>
-<ul>
-    {% for transaction in recent_transactions %}
-        <li>{{ transaction.date }} - {{ transaction.category.name }}: {{ transaction.amount }}</li>
-    {% endfor %}
-</ul>
-
-<h2>Spending by Category</h2>
-<canvas id="categoryChart"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -33,8 +51,20 @@
                     {{ entry.total_spent }},
                 {% endfor %}
             ],
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 206, 86, 0.2)'
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 206, 86, 1)'
+            ],
             borderWidth: 1
         }]
     };
@@ -44,6 +74,12 @@
         type: 'bar',
         data: categoryData,
         options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true
@@ -52,5 +88,4 @@
         }
     });
 </script>
-
 {% endblock %}
