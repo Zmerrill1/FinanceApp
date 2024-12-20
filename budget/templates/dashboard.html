@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 
 {% block content %}
 <div class="container mx-auto py-6">
@@ -9,11 +10,12 @@
     <div class="summary grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
         <div class="p-4 bg-green-100 border border-green-300 rounded-lg shadow">
             <h3 class="text-lg font-semibold text-green-700">Total Income:</h3>
-            <p class="text-xl font-bold">{{ total_income }}</p>
+            <p class="text-xl font-bold">{{ total_income|usd }}</p>
+            <p>{{ 1234.56|usd }}</p>
         </div>
         <div class="p-4 bg-red-100 border border-red-300 rounded-lg shadow">
             <h3 class="text-lg font-semibold text-red-700">Total Expenses:</h3>
-            <p class="text-xl font-bold">{{ total_expenses }}</p>
+            <p class="text-xl font-ßbold">{{ total_expenses|usd }}</p>
         </div>
     </div>
 
@@ -24,7 +26,8 @@
         <li class="p-4 hover:bg-gray-100 flex justify-between items-center">
             <span class="font-medium">{{ transaction.date }}</span>
             <span>{{ transaction.category.name }}</span>
-            <span class="font-bold">{{ transaction.amount }}</span>
+            <span>{{ transaction.description }}</span>
+            <span class="font-bold">{{ transaction.amount|usd }}</span>
         </li>
         {% endfor %}
     </ul>
@@ -37,11 +40,13 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
 <script>
     const categoryData = {
         labels: [
             {% for entry in category_spending %}
-                "{{ entry.category__name }}",
+                "{{ entry.category__name|title }}",
             {% endfor %}
         ],
         datasets: [{
@@ -77,12 +82,27 @@
             responsive: true,
             plugins: {
                 legend: {
-                    position: 'top'
+                    position: 'top',
+                    display: false,
+                },
+                datalabels: {
+                    display: true,
+                    align: 'center',
+                    font: {
+                        weight: 'bold',
+                        size: 12
+                    },
+                    formatter: function(value) {
+                        return '$' + value.toFixed(2);
+                    }
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) { return '$' + value.toFixed(2); }
+                    }
                 }
             }
         }

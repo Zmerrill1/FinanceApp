@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Account, Transaction
+from .models import Account, BudgetItem, Transaction
 
 
 class CSVUploadForm(forms.Form):
@@ -14,3 +14,9 @@ class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ["account", "amount", "date", "description", "budget_item"]
+
+
+class TransactionBudgetItemForm(forms.Form):
+    budget_item = forms.ModelChoiceField(
+        queryset=BudgetItem.objects.all(), empty_label="Select Budget Item"
+    )

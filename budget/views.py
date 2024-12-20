@@ -9,7 +9,7 @@ from django.db.models import Case, DecimalField, F, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CSVUploadForm, TransactionForm
-from .models import Transaction, UploadedFile
+from .models import BudgetItem, Transaction, UploadedFile
 
 
 def parse_date(date_str: str) -> date:
@@ -130,14 +130,31 @@ def delete_transaction(request, transaction_id):
 @login_required
 def transaction_list(request):
     transactions = Transaction.objects.all()
-    return render(request, "transaction_list.html", {"transactions": transactions})
+    budget_item = BudgetItem.objects.all()
+
+    if request.method == "POST":
+        transaction_id = request.POST.get("transaction_id")
+        budget_item_id = request.POST.get("budget_item_id")
+        if transaction_id and budget_item_id:
+            transaction = Transaction.objects.get(id=transaction_id)
+            budget_item = BudgetItem.objects.get(id=budget_item_id)
+            transaction.budget_item = budget_item
+            transaction.save()
+            return redirect("transaction_list")
+
+    return render(
+        request,
+        "transaction_list.html",
+        {"transactions": transactions, "budget_item": budget_item},
+    )
 
 
 def dashboard(request):
     recent_transactions = Transaction.objects.order_by("-date")[:5]
 
     category_spending = (
-        Transaction.objects.values("budget_item")
+        Transaction.objects.filter(transaction_type="EXPENSE")
+        .values("budget_item")
         .annotate(total_spent=Sum("amount"))
         .order_by("-total_spent")
     )
@@ -145,14 +162,14 @@ def dashboard(request):
     result = Transaction.objects.aggregate(
         total_income=Sum(
             Case(
-                When(amount__gt=0, then=F("amount")),
+                When(transaction_type="INCOME", then=F("amount")),
                 default=Value(0, output_field=DecimalField()),
             ),
             output_field=DecimalField(),
         ),
         total_expenses=Sum(
             Case(
-                When(amount__lt=0, then=F("amount")),
+                When(transaction_type="EXPENSE", then=F("amount")),
                 default=Value(0, output_field=DecimalField()),
             ),
             output_field=DecimalField(),
