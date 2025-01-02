@@ -69,7 +69,7 @@ def upload_csv(request):
 
             for row in reader:
                 transaction_date = parse_date(row["Transaction Date"])
-                amount = parse_amount(row["Amount"])
+                amount = abs(parse_amount(row["Amount"]))
 
                 transactions.append(
                     Transaction(
@@ -154,9 +154,9 @@ def dashboard(request):
 
     category_spending = (
         Transaction.objects.filter(transaction_type="EXPENSE")
-        .values("budget_item")
+        .values("budget_item__budget_category")
         .annotate(total_spent=Sum("amount"))
-        .order_by("-total_spent")
+        .order_by("budget_item__budget_category")
     )
 
     result = Transaction.objects.aggregate(

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load currency_tags %}
+{% load tags %}
 
 {% block content %}
 <div class="container mx-auto py-6">
@@ -15,7 +15,7 @@
         </div>
         <div class="p-4 bg-red-100 border border-red-300 rounded-lg shadow">
             <h3 class="text-lg font-semibold text-red-700">Total Expenses:</h3>
-            <p class="text-xl font-ßbold">{{ total_expenses|usd }}</p>
+            <p class="text-xl font-bold">{{ total_expenses|usd }}</p>
         </div>
     </div>
 
@@ -46,7 +46,7 @@
     const categoryData = {
         labels: [
             {% for entry in category_spending %}
-                "{{ entry.category__name|title }}",
+                "{{ entry.budget_item__budget_category|title }}",
             {% endfor %}
         ],
         datasets: [{

@@ -12,8 +12,6 @@ locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 def usd(value):
     """Formats a number as USD"""
     try:
-        if isinstance(value, Decimal):
-            value = float(value)
-            return locale.currency(value, grouping=True)
-    except (ValueError, TypeError):
-        return "$0.00"
+        value = Decimal(value)
+    except (ValueError, TypeError, locale.Error):
+        return locale.currency(value, grouping=True)
