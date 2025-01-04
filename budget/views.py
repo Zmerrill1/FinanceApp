@@ -1,12 +1,13 @@
 import csv
 import hashlib
 import io
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Case, DecimalField, F, Sum, Value, When
+from django.db.models import Case, DecimalField, F, Q, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.timezone import make_aware
 
 from .forms import CSVUploadForm, TransactionForm
 from .models import BudgetItem, Transaction, UploadedFile
@@ -150,18 +151,49 @@ def transaction_list(request):
 
 
 def dashboard(request):
-    recent_transactions = Transaction.objects.select_related("budget_item").order_by(
-        "-date"
-    )[:5]
+    today = datetime.today()
+    start_date, end_date = None, None
+
+    filter_option = request.GET.get("filter", "this_month")
+
+    if filter_option == "this_month":
+        start_date = today.replace(day=1)
+        end_date = today
+    elif filter_option == "last_month":
+        first_of_this_month = today.replace(day=1)
+        start_date = (first_of_this_month - timedelta(days=1)).replace(day=1)
+        end_date = first_of_this_month - timedelta(days=1)
+    elif filter_option == "this_year":
+        start_date = today.replace(month=1, day=1)
+        end_date = today
+    elif filter_option == "last_year":
+        start_date = today.replace(year=today.year - 1, month=1, day=1)
+        end_date = today.replace(year=today.year - 1, month=12, day=31)
+    elif filter_option == "custom":
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+        if start_date and end_date:
+            start_date = make_aware(datetime.strptime(start_date, "%Y-%m-%d"))
+            end_date = make_aware(datetime.strptime(end_date, "%Y-%m-%d"))
+
+    date_filter = Q()
+    if start_date and end_date:
+        date_filter = Q(date__range=(start_date, end_date))
+
+    recent_transactions = (
+        Transaction.objects.select_related("budget_item")
+        .filter(date_filter)
+        .order_by("-date")[:5]
+    )
 
     category_spending = (
-        Transaction.objects.filter(transaction_type="EXPENSE")
+        Transaction.objects.filter(date_filter, transaction_type="EXPENSE")
         .values("budget_item__budget_category")
         .annotate(total_spent=Sum("amount"))
         .order_by("budget_item__budget_category")
     )
 
-    result = Transaction.objects.aggregate(
+    result = Transaction.objects.filter(date_filter).aggregate(
         total_income=Sum(
             Case(
                 When(transaction_type="INCOME", then=F("amount")),
@@ -185,6 +217,7 @@ def dashboard(request):
         "category_spending": category_spending,
         "total_income": total_income,
         "total_expenses": total_expenses,
+        "filter_option": filter_option,
     }
 
     return render(request, "dashboard.html", context)

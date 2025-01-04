@@ -1,26 +1,49 @@
 {% load static %}
-{% load tags %}
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="{% static '/css/output.css' %}">
-    <title>{% block title %}{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <title>{% block title %}Finance App{% endblock %}</title>
 </head>
-<body>
-    <header>
-        <h1>Finance App</h1>
-        <nav>
-            <!-- Navigation Links -->
-        </nav>
+<body class="bg-gray-100 text-gray-800">
+    <header class="bg-blue-600 text-white">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold">Finance App</h1>
+                <nav>
+                    <ul class="flex space-x-4">
+                        <li>
+                            <a href="{% url 'dashboard' %}"
+                               class="hover:text-blue-300 transition-colors">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'transaction_list' %}"
+                               class="hover:text-blue-300 transition-colors">
+                                Transactions
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'upload_csv' %}"
+                               class="hover:text-blue-300 transition-colors">
+                                Upload
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </header>
 
-    <div class="content">
+    <main class="container mx-auto px-4 py-8">
         {% block content %}{% endblock %}
-    </div>
+    </main>
 
-    <footer>
-        <p>Site Footer</p>
+    <footer class="bg-gray-800 text-gray-400 text-center py-4">
+        <p>&copy; 2025 Finance App</p>
     </footer>
 </body>
 </html>
