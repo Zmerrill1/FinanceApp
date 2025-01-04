@@ -5,7 +5,10 @@ from django import template
 
 register = template.Library()
 
-locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
+try:
+    locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, "")
 
 
 @register.filter
@@ -13,5 +16,6 @@ def usd(value):
     """Formats a number as USD"""
     try:
         value = Decimal(value)
-    except (ValueError, TypeError, locale.Error):
         return locale.currency(value, grouping=True)
+    except (ValueError, TypeError, locale.Error):
+        return "$0.00"

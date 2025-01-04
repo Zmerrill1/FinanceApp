@@ -150,7 +150,9 @@ def transaction_list(request):
 
 
 def dashboard(request):
-    recent_transactions = Transaction.objects.order_by("-date")[:5]
+    recent_transactions = Transaction.objects.select_related("budget_item").order_by(
+        "-date"
+    )[:5]
 
     category_spending = (
         Transaction.objects.filter(transaction_type="EXPENSE")
