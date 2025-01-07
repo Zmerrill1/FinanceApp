@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto mt-8">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Add Bank Account</h1>
+    <form method="post" class="bg-white p-6 rounded shadow">
+        {% csrf_token %}
+        <div class="space-y-4">
+            {% for field in form %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="text-red-600 text-sm">{{ field.errors|striptags }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="flex justify-end mt-4">
+            <button type="submit"
+                    class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
+                Save
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

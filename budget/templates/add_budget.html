@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-3xl font-semibold text-gray-800 mb-6">Add Budget</h1>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Budget Name -->
+      <div class="mb-4">
+        <label for="{{ form.name.id_for_label }}" class="block text-gray-700 font-medium">Budget Name</label>
+        <input type="text" name="name" id="{{ form.name.id_for_label }}" value="{{ form.name.value }}" class="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <!-- Start Date -->
+      <div class="mb-4">
+        <label for="{{ form.start_date.id_for_label }}" class="block text-gray-700 font-medium">Start Date</label>
+        <input type="date" name="start_date" id="{{ form.start_date.id_for_label }}" value="{{ form.start_date.value }}" class="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <!-- End Date -->
+      <div class="mb-4">
+        <label for="{{ form.end_date.id_for_label }}" class="block text-gray-700 font-medium">End Date</label>
+        <input type="date" name="end_date" id="{{ form.end_date.id_for_label }}" value="{{ form.end_date.value }}" class="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="w-full py-3 mt-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 ease-in-out">Save Budget</button>
+    </form>
+  </div>
+{% endblock %}

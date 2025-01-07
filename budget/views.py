@@ -9,8 +9,14 @@ from django.db.models import Case, DecimalField, F, Q, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import make_aware
 
-from .forms import CSVUploadForm, TransactionForm
-from .models import BudgetItem, Transaction, UploadedFile
+from .forms import (
+    AccountForm,
+    BudgetForm,
+    BudgetItemForm,
+    CSVUploadForm,
+    TransactionForm,
+)
+from .models import Account, Budget, BudgetItem, Transaction, UploadedFile
 
 
 def parse_date(date_str: str) -> date:
@@ -221,3 +227,91 @@ def dashboard(request):
     }
 
     return render(request, "dashboard.html", context)
+
+
+def bank_account_list(request):
+    accounts = Account.objects.all()
+    return render(request, "bank_account_list.html", {"accounts": accounts})
+
+
+def add_bank_account(request):
+    if request.method == "POST":
+        form = AccountForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("bank_account_list")
+    else:
+        form = AccountForm()
+    return render(request, "add_bank_account.html", {"form": form})
+
+
+def edit_bank_account(request, account_id):
+    account = get_object_or_404(Account, id=account_id)
+    if request.method == "POST":
+        form = AccountForm(request.POST, instance=account)
+        if form.is_valid():
+            form.save()
+            return redirect("bank_account_list")
+    else:
+        form = AccountForm(instance=account)
+    return render(request, "edit_bank_account.html", {"form": form, "account": account})
+
+
+def delete_bank_account(request, account_id):
+    account = get_object_or_404(Account, id=account_id)
+    if request.method == "POST":
+        account.delete()
+        return redirect("bank_account_list")
+    return render(request, "delete_bank_account.html", {"account": account})
+
+
+def budget_list(request):
+    budgets = Budget.objects.all()
+    return render(request, "budget_list.html", {"budgets": budgets})
+
+
+def add_budget(request):
+    if request.method == "POST":
+        form = BudgetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("budget_list")
+        else:
+            return render(request, "add_budget.html", {"form": form})
+    else:
+        form = BudgetForm()
+    return render(request, "add_budget.html", {"form": form})
+
+
+def budget_item_list(request):
+    items = BudgetItem.objects.all()
+    return render(request, "budget_item_list.html", {"items": items})
+
+
+def add_budget_item(request):
+    if request.method == "POST":
+        form = BudgetItemForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("budget_item_list")
+    else:
+        form = BudgetItemForm()
+    return render(request, "add_budget_item.html", {"form": form})
+
+
+def edit_budget_item(request, budget_item_id):
+    item = get_object_or_404(BudgetItem, id=budget_item_id)
+    if request.method == "POST":
+        form = BudgetItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect("budget_item_list")
+    else:
+        form = BudgetItemForm(instance=item)
+    return render(request, "edit_budget_item.html", {"form": form})
+
+
+def delete_budget_item(request, budget_item_id):
+    item = get_object_or_404(BudgetItem, id=budget_item_id)
+    item.delete()
+    return redirect("budget_item_list")
