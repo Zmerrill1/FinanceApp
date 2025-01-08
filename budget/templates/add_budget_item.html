@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">Add New Budget Item</h1>
+
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <form action="{% url 'add_budget_item' %}" method="POST" class="space-y-6 p-6">
+            {% csrf_token %}
+
+            <!-- Budget Field -->
+            <div class="space-y-1">
+                <label for="budget" class="block text-sm font-medium text-gray-700">Budget</label>
+                {{ form.budget }}
+                {% if form.budget.errors %}
+                    <div class="text-red-600 text-sm mt-2">
+                        {% for error in form.budget.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Budget Category Field -->
+            <div class="space-y-1">
+                <label for="budget_category" class="block text-sm font-medium text-gray-700">Category</label>
+                {{ form.budget_category }}
+                {% if form.budget_category.errors %}
+                    <div class="text-red-600 text-sm mt-2">
+                        {% for error in form.budget_category.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Description Field -->
+            <div class="space-y-1">
+                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <div class="text-red-600 text-sm mt-2">
+                        {% for error in form.description.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Planned Amount Field -->
+            <div class="space-y-1">
+                <label for="planned_amount" class="block text-sm font-medium text-gray-700">Planned Amount</label>
+                {{ form.planned_amount }}
+                {% if form.planned_amount.errors %}
+                    <div class="text-red-600 text-sm mt-2">
+                        {% for error in form.planned_amount.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Spent Amount Field -->
+            <div class="space-y-1">
+                <label for="spent_amount" class="block text-sm font-medium text-gray-700">Spent Amount</label>
+                {{ form.spent_amount }}
+                {% if form.spent_amount.errors %}
+                    <div class="text-red-600 text-sm mt-2">
+                        {% for error in form.spent_amount.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end">
+                <button
+                    type="submit"
+                    class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Add Budget Item
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -156,31 +156,50 @@ def transaction_list(request):
     )
 
 
+def get_date_range(filter_option, request, today):
+    match filter_option:
+        case "this_month":
+            start_date = today.replace(day=1)
+            end_date = today
+        case "last_month":
+            first_of_this_month = today.replace(day=1)
+            start_date = (first_of_this_month - timedelta(days=1)).replace(day=1)
+            end_date = first_of_this_month - timedelta(days=1)
+        case "this_year":
+            start_date = today.replace(month=1, day=1)
+            end_date = today
+        case "last_year":
+            start_date = today.replace(year=today.year - 1, month=1, day=1)
+            end_date = today.replace(year=today.year - 1, month=12, day=31)
+        case "custom":
+            start_date = request.GET.get("start_date")
+            end_date = request.GET.get("end_date")
+    return start_date, end_date
+
+
+def validate_custom_dates(start_date, end_date):
+    try:
+        if not start_date or not end_date:
+            raise ValueError(
+                "Start date and end date are required for the custom filter"
+            )
+
+        start_date = make_aware(datetime.strptime(start_date, "%Y-%m-%d"))
+        end_date = make_aware(datetime.strptime(end_date, "%Y-%m-%d"))
+
+        if start_date > end_date:
+            raise ValueError("Start date cannot be later than end date.")
+    except (ValueError, TypeError) as e:
+        start_date, end_date = None, None
+        print(f"Invalid custom date range: {e}")
+    return start_date, end_date
+
+
+@login_required
 def dashboard(request):
     today = datetime.today()
-    start_date, end_date = None, None
-
     filter_option = request.GET.get("filter", "this_month")
-
-    if filter_option == "this_month":
-        start_date = today.replace(day=1)
-        end_date = today
-    elif filter_option == "last_month":
-        first_of_this_month = today.replace(day=1)
-        start_date = (first_of_this_month - timedelta(days=1)).replace(day=1)
-        end_date = first_of_this_month - timedelta(days=1)
-    elif filter_option == "this_year":
-        start_date = today.replace(month=1, day=1)
-        end_date = today
-    elif filter_option == "last_year":
-        start_date = today.replace(year=today.year - 1, month=1, day=1)
-        end_date = today.replace(year=today.year - 1, month=12, day=31)
-    elif filter_option == "custom":
-        start_date = request.GET.get("start_date")
-        end_date = request.GET.get("end_date")
-        if start_date and end_date:
-            start_date = make_aware(datetime.strptime(start_date, "%Y-%m-%d"))
-            end_date = make_aware(datetime.strptime(end_date, "%Y-%m-%d"))
+    start_date, end_date = get_date_range(filter_option, request, today)
 
     date_filter = Q()
     if start_date and end_date:
@@ -229,11 +248,13 @@ def dashboard(request):
     return render(request, "dashboard.html", context)
 
 
+@login_required
 def bank_account_list(request):
     accounts = Account.objects.all()
     return render(request, "bank_account_list.html", {"accounts": accounts})
 
 
+@login_required
 def add_bank_account(request):
     if request.method == "POST":
         form = AccountForm(request.POST)
@@ -245,6 +266,7 @@ def add_bank_account(request):
     return render(request, "add_bank_account.html", {"form": form})
 
 
+@login_required
 def edit_bank_account(request, account_id):
     account = get_object_or_404(Account, id=account_id)
     if request.method == "POST":
@@ -257,6 +279,7 @@ def edit_bank_account(request, account_id):
     return render(request, "edit_bank_account.html", {"form": form, "account": account})
 
 
+@login_required
 def delete_bank_account(request, account_id):
     account = get_object_or_404(Account, id=account_id)
     if request.method == "POST":
@@ -265,11 +288,13 @@ def delete_bank_account(request, account_id):
     return render(request, "delete_bank_account.html", {"account": account})
 
 
+@login_required
 def budget_list(request):
     budgets = Budget.objects.all()
     return render(request, "budget_list.html", {"budgets": budgets})
 
 
+@login_required
 def add_budget(request):
     if request.method == "POST":
         form = BudgetForm(request.POST)
@@ -283,11 +308,13 @@ def add_budget(request):
     return render(request, "add_budget.html", {"form": form})
 
 
+@login_required
 def budget_item_list(request):
-    items = BudgetItem.objects.all()
-    return render(request, "budget_item_list.html", {"items": items})
+    budget_items = BudgetItem.objects.all()
+    return render(request, "budget_item_list.html", {"budget_items": budget_items})
 
 
+@login_required
 def add_budget_item(request):
     if request.method == "POST":
         form = BudgetItemForm(request.POST)
@@ -299,6 +326,7 @@ def add_budget_item(request):
     return render(request, "add_budget_item.html", {"form": form})
 
 
+@login_required
 def edit_budget_item(request, budget_item_id):
     item = get_object_or_404(BudgetItem, id=budget_item_id)
     if request.method == "POST":
@@ -311,6 +339,7 @@ def edit_budget_item(request, budget_item_id):
     return render(request, "edit_budget_item.html", {"form": form})
 
 
+@login_required
 def delete_budget_item(request, budget_item_id):
     item = get_object_or_404(BudgetItem, id=budget_item_id)
     item.delete()

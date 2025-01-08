@@ -65,3 +65,14 @@ class BudgetItemForm(forms.ModelForm):
             "planned_amount",
             "spent_amount",
         ]
+
+    budget = forms.ModelChoiceField(
+        queryset=Budget.objects.all(),
+        empty_label="Select a budget",
+        required=True,
+        widget=forms.Select(
+            attrs={
+                "class": "mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            }
+        ),
+    )
