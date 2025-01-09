@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg mt-8">
+    <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Login</h2>
+
+    <form method="POST" class="space-y-4">
+        {% csrf_token %}
+
+        <!-- Username Field -->
+        <div>
+            <label for="id_username" class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" name="username" class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="id_username" required>
+        </div>
+
+        <!-- Password Field -->
+        <div>
+            <label for="id_password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" name="password" class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="id_password" required>
+        </div>
+
+        <!-- Login Button -->
+        <div>
+            <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors">Login</button>
+        </div>
+    </form>
+
+    <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">Don't have an account? <a href="{% url 'signup' %}" class="text-blue-600 hover:text-blue-500">Sign up</a></p>
+    </div>
+</div>
+{% endblock %}

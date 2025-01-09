@@ -3,41 +3,37 @@
 {% block title %}Edit Transaction{% endblock %}
 
 {% block content %}
-    <div class="max-w-3xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-lg">
-        <h1 class="text-3xl font-semibold text-gray-800 mb-6">Edit Transaction</h1>
+<div class="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4 text-center">Edit Transaction</h1>
 
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
 
-            <div class="space-y-4">
-                {% for field in form %}
-                    <div class="flex flex-col">
-                        <label for="{{ field.id_for_label }}" class="text-sm font-medium text-gray-600">{{ field.label }}</label>
-                        <div class="mt-1">
-                            {{ field }}
-                        </div>
-                        {% if field.errors %}
-                            <p class="text-red-500 text-xs mt-1">
-                                {% for error in field.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </p>
-                        {% endif %}
-                    </div>
+        <!-- Form Fields -->
+        {% for field in form %}
+        <div class="border border-gray-300 rounded-lg p-2">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+            <p class="text-red-500 text-sm mt-1">
+                {% for error in field.errors %}
+                {{ error }}<br>
                 {% endfor %}
-            </div>
-
-            <div class="flex items-center justify-between">
-                <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">
-                    Save Changes
-                </button>
-            </div>
-        </form>
-
-        <div class="mt-6 text-center">
-            <a href="{% url 'transaction_list' %}" class="text-blue-600 hover:text-blue-800">
-                &larr; Back to Transaction List
-            </a>
+            </p>
+            {% endif %}
         </div>
+        {% endfor %}
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+            Save Changes
+        </button>
+    </form>
+
+    <div class="mt-4 text-center">
+        <a href="{% url 'transaction_list' %}" class="text-blue-600 hover:text-blue-800 underline">
+            &larr; Back to Transaction List
+        </a>
     </div>
+</div>
 {% endblock %}

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
     <title>{% block title %}Finance App{% endblock %}</title>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
     <header class="bg-blue-600 text-white">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
@@ -15,53 +15,69 @@
                 <nav>
                     <ul class="flex space-x-4">
                         <li>
-                            <a href="{% url 'dashboard' %}"
-                               class="hover:text-blue-300 transition-colors">
+                            <a href="{% url 'dashboard' %}" class="hover:text-blue-300 transition-colors">
                                 Dashboard
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'transaction_list' %}"
-                               class="hover:text-blue-300 transition-colors">
+                            <a href="{% url 'transaction_list' %}" class="hover:text-blue-300 transition-colors">
                                 Transactions
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'upload_csv' %}"
-                               class="hover:text-blue-300 transition-colors">
+                            <a href="{% url 'upload_csv' %}" class="hover:text-blue-300 transition-colors">
                                 Upload
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'bank_account_list' %}"
-                               class="hover:text-blue-300 transition-colors">
+                            <a href="{% url 'bank_account_list' %}" class="hover:text-blue-300 transition-colors">
                                 Bank Accounts
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'budget_list' %}"
-                               class="hover:text-blue-300 transition-colors">
+                            <a href="{% url 'budget_list' %}" class="hover:text-blue-300 transition-colors">
                                 Budgets
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'budget_item_list' %}"
-                               class="hover:text-blue-300 transition-colors">
+                            <a href="{% url 'budget_item_list' %}" class="hover:text-blue-300 transition-colors">
                                 Budget Items
                             </a>
                         </li>
+
+                        <!-- Authentication Links -->
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a href="{% url 'logout' %}" class="hover:text-blue-300 transition-colors">
+                                    Logout
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{% url 'signup' %}" class="hover:text-blue-300 transition-colors">
+                                    Sign Up
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'login' %}" class="hover:text-blue-300 transition-colors">
+                                    Login
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-8">
+    <main class="flex-grow container mx-auto px-4 py-8">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="bg-gray-800 text-gray-400 text-center py-4">
+        {% block footer %}
         <p>&copy; 2025 Finance App</p>
+        {% endblock %}
     </footer>
 </body>
 </html>

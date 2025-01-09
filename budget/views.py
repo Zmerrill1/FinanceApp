@@ -5,6 +5,8 @@ from datetime import date, datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.views import LoginView
 from django.db.models import Case, DecimalField, F, Q, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import make_aware
@@ -17,6 +19,21 @@ from .forms import (
     TransactionForm,
 )
 from .models import Account, Budget, BudgetItem, Transaction, UploadedFile
+
+
+def signup(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("login")
+    else:
+        form = UserCreationForm()
+    return render(request, "signup.html", {"form": form})
+
+
+class CustomLoginView(LoginView):
+    template_name = "login.html"
 
 
 def parse_date(date_str: str) -> date:
@@ -76,7 +93,13 @@ def upload_csv(request):
 
             for row in reader:
                 transaction_date = parse_date(row["Transaction Date"])
-                amount = abs(parse_amount(row["Amount"]))
+                amount = parse_amount(row["Amount"])
+
+                if amount < 0:
+                    amount = abs(amount)
+                    transaction_type = "Expense"
+                else:
+                    transaction_type = "Income"
 
                 transactions.append(
                     Transaction(
@@ -84,6 +107,7 @@ def upload_csv(request):
                         date=transaction_date,
                         description=row["Description"],
                         amount=amount,
+                        transaction_type=transaction_type,
                     )
                 )
 
@@ -156,7 +180,7 @@ def transaction_list(request):
     )
 
 
-def get_date_range(filter_option, request, today):
+def create_date_range(filter_option, today):
     match filter_option:
         case "this_month":
             start_date = today.replace(day=1)
@@ -171,14 +195,17 @@ def get_date_range(filter_option, request, today):
         case "last_year":
             start_date = today.replace(year=today.year - 1, month=1, day=1)
             end_date = today.replace(year=today.year - 1, month=12, day=31)
-        case "custom":
-            start_date = request.GET.get("start_date")
-            end_date = request.GET.get("end_date")
+        case _:
+            start_date, end_date = None, None
     return start_date, end_date
 
 
-def validate_custom_dates(start_date, end_date):
+def validate_custom_dates(request):
+    """Parses and validates the custom dates from the request."""
     try:
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+
         if not start_date or not end_date:
             raise ValueError(
                 "Start date and end date are required for the custom filter"
@@ -190,9 +217,16 @@ def validate_custom_dates(start_date, end_date):
         if start_date > end_date:
             raise ValueError("Start date cannot be later than end date.")
     except (ValueError, TypeError) as e:
-        start_date, end_date = None, None
         print(f"Invalid custom date range: {e}")
+        start_date, end_date = None, None
     return start_date, end_date
+
+
+def get_date_range(filter_option, request, today):
+    if filter_option == "custom":
+        return validate_custom_dates(request)
+    else:
+        return create_date_range(filter_option, today)
 
 
 @login_required

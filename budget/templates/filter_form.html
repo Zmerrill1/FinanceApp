@@ -3,7 +3,7 @@
     <div>
         <label for="filter" class="block text-sm font-medium text-gray-700">Date Filter:</label>
         <select name="filter" id="filter" class="mt-1 block w-full py-1 px-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" onchange="this.form.submit()">
-            <option value="this_month" {% if filter_option| == 'this_month' %}selected{% endif %}>This Month</option>
+            <option value="this_month" {% if filter_option == 'this_month' %}selected{% endif %}>This Month</option>
             <option value="last_month" {% if filter_option == 'last_month' %}selected{% endif %}>Last Month</option>
             <option value="this_year" {% if filter_option == 'this_year' %}selected{% endif %}>This Year</option>
             <option value="last_year" {% if filter_option == 'last_year' %}selected{% endif %}>Last Year</option>

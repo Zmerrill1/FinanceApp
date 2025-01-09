@@ -13,7 +13,14 @@ class TransactionForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
-        fields = ["account", "amount", "date", "description", "budget_item"]
+        fields = [
+            "account",
+            "amount",
+            "date",
+            "description",
+            "budget_item",
+            "transaction_type",
+        ]
 
 
 class TransactionBudgetItemForm(forms.Form):
