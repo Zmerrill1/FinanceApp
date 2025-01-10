@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load tags %}
+
+{% block content %}
+<div class="container mx-auto mt-8">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Bank Accounts</h1>
+    <div class="mb-4">
+        <a href="{% url 'add_bank_account' %}"
+           class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
+            Add Bank Account
+        </a>
+    </div>
+
+    <div class="bg-white shadow rounded-md">
+        <table class="table-auto w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-100 text-gray-700">
+                    <th class="px-4 py-2">Name</th>
+                    <th class="px-4 py-2">Account Type</th>
+                    <th class="px-4 py-2">Balance</th>
+                    <th class="px-4 py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                <tr class="border-t hover:bg-gray-50">
+                    <td class="px-4 py-2">{{ account.name }}</td>
+                    <td class="px-4 py-2">{{ account.account_type }}</td>
+                    <td class="px-4 py-2">{{ account.balance | usd }}</td>
+                    <td class="px-4 py-2">
+                        <a href="{% url 'edit_bank_account' account.pk %}"
+                           class="text-blue-500 hover:underline">Edit</a> |
+                        <a href="{% url 'delete_bank_account' account.pk %}"
+                           class="text-red-500 hover:underline">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-4 py-2 text-center text-gray-500">
+                        No bank accounts found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

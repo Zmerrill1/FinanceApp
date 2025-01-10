@@ -3,11 +3,30 @@
 {% block title %}Add New Transaction{% endblock %}
 
 {% block content %}
-    <h1>Add New Transaction</h1>
-    <form method="post">
+<div class="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Add New Transaction</h1>
+    <form method="post" class="space-y-4">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Add Transaction</button>
+        <div class="space-y-4">
+            {% for field in form %}
+            <div class="border border-gray-300 rounded-lg p-2">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                <p class="text-red-500 text-sm">{{ field.errors }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+            Add Transaction
+        </button>
     </form>
-    <a href="{% url 'transaction_list' %}">Back to Transaction List</a>
+    <div class="mt-4 text-center">
+        <a href="{% url 'transaction_list' %}"
+           class="text-blue-600 hover:text-blue-800 underline">
+            Back to Transaction List
+        </a>
+    </div>
+</div>
 {% endblock %}

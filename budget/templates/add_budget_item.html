@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Budget Item{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4 text-center">Add New Budget Item</h1>
+
+    <form action="{% url 'add_budget_item' %}" method="POST" class="space-y-4">
+        {% csrf_token %}
+
+        <!-- Budget Field -->
+        <div class="border border-gray-300 rounded-lg p-2">
+            <label for="budget" class="block text-gray-700 font-medium">Budget</label>
+            {{ form.budget }}
+            {% if form.budget.errors %}
+            <p class="text-red-500 text-sm mt-1">
+                {% for error in form.budget.errors %}
+                {{ error }}<br>
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Budget Category Field -->
+        <div class="border border-gray-300 rounded-lg p-2">
+            <label for="budget_category" class="block text-gray-700 font-medium">Category</label>
+            {{ form.budget_category }}
+            {% if form.budget_category.errors %}
+            <p class="text-red-500 text-sm mt-1">
+                {% for error in form.budget_category.errors %}
+                {{ error }}<br>
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Description Field -->
+        <div class="border border-gray-300 rounded-lg p-2">
+            <label for="description" class="block text-gray-700 font-medium">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <p class="text-red-500 text-sm mt-1">
+                {% for error in form.description.errors %}
+                {{ error }}<br>
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Planned Amount Field -->
+        <div class="border border-gray-300 rounded-lg p-2">
+            <label for="planned_amount" class="block text-gray-700 font-medium">Planned Amount</label>
+            {{ form.planned_amount }}
+            {% if form.planned_amount.errors %}
+            <p class="text-red-500 text-sm mt-1">
+                {% for error in form.planned_amount.errors %}
+                {{ error }}<br>
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Spent Amount Field -->
+        <div class="border border-gray-300 rounded-lg p-2">
+            <label for="spent_amount" class="block text-gray-700 font-medium">Spent Amount</label>
+            {{ form.spent_amount }}
+            {% if form.spent_amount.errors %}
+            <p class="text-red-500 text-sm mt-1">
+                {% for error in form.spent_amount.errors %}
+                {{ error }}<br>
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+            Add Budget Item
+        </button>
+    </form>
+
+    <div class="mt-4 text-center">
+        <a href="{% url 'budget_item_list' %}" class="text-blue-600 hover:text-blue-800 underline">
+            Back to Budget Item List
+        </a>
+    </div>
+</div>
+{% endblock %}

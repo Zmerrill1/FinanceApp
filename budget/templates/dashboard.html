@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load tags %}
+
+{% block content %}
+<div class="container mx-auto py-6">
+    <!-- Dashboard Heading -->
+    <h1 class="text-3xl font-bold text-center mb-6">Dashboard</h1>
+
+    {% include "filter_form.html" %}
+
+    <!-- Summary Section -->
+    <div class="summary grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+        <div class="p-4 bg-green-100 border border-green-300 rounded-lg shadow">
+            <h3 class="text-lg font-semibold text-green-700">Total Income:</h3>
+            <p class="text-xl font-bold">{{ total_income | usd}}</p>
+        </div>
+        <div class="p-4 bg-red-100 border border-red-300 rounded-lg shadow">
+            <h3 class="text-lg font-semibold text-red-700">Total Expenses:</h3>
+            <p class="text-xl font-bold">{{ total_expenses | usd }}</p>
+        </div>
+    </div>
+
+    <!-- Recent Transactions Section -->
+    <h2 class="text-2xl font-semibold mb-4">Recent Transactions</h2>
+    <ul class="divide-y divide-gray-200 border border-gray-300 rounded-lg overflow-hidden mb-8">
+        {% for transaction in recent_transactions %}
+        <li class="p-4 hover:bg-gray-100 flex justify-between items-center">
+            <div class="flex justify-between w-full">
+                <span class="font-medium flex-1">{{ transaction.date }}</span>
+                <span class="flex-1 text-center">{{ transaction.budget_item.budget_category }}</span>
+                <span class="flex-1 text-center">{{ transaction.description }}</span>
+                <span class="font-bold flex-1 text-right">{{ transaction.amount | usd }}</span>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+
+    <!-- Spending by Category Section -->
+    <h2 class="text-2xl font-semibold mb-4">Spending by Category</h2>
+    <div class="bg-white p-4 border border-gray-300 rounded-lg shadow">
+        <canvas id="categoryChart" class="w-full"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script>
+    const categoryData = {
+        labels: [
+            {% for entry in category_spending %}
+                "{{ entry.budget_item__budget_category|title }}",
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Spending by Category',
+            data: [
+                {% for entry in category_spending %}
+                    {{ entry.total_spent }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 206, 86, 0.2)'
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 206, 86, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: categoryData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    display: false,
+                },
+                datalabels: {
+                    display: true,
+                    align: 'center',
+                    font: {
+                        weight: 'bold',
+                        size: 12
+                    },
+                    formatter: function(value) {
+                        return '$' + value.toFixed(2);
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) { return '$' + value.toFixed(2); }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

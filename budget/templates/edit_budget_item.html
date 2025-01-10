@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Budget Item{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4 text-center">Edit Budget Item</h1>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+
+        <!-- Form Fields -->
+        {% for field in form %}
+        <div class="border border-gray-300 rounded-lg p-2">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+            <p class="text-red-500 text-sm mt-1">
+                {% for error in field.errors %}
+                {{ error }}<br>
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Action Buttons -->
+        <div class="flex justify-between items-center">
+            <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+                Save Changes
+            </button>
+            <a href="{% url 'budget_item_list' %}" class="text-blue-600 hover:text-blue-800 underline">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

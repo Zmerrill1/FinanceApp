@@ -1,0 +1,34 @@
+<!-- templates/includes/filter_form.html -->
+<form method="get" class="date-filter-form mb-6 flex flex-wrap gap-4 items-center bg-gray-100 p-4 rounded-lg shadow">
+    <div>
+        <label for="filter" class="block text-sm font-medium text-gray-700">Date Filter:</label>
+        <select name="filter" id="filter" class="mt-1 block w-full py-1 px-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" onchange="this.form.submit()">
+            <option value="this_month" {% if filter_option == 'this_month' %}selected{% endif %}>This Month</option>
+            <option value="last_month" {% if filter_option == 'last_month' %}selected{% endif %}>Last Month</option>
+            <option value="this_year" {% if filter_option == 'this_year' %}selected{% endif %}>This Year</option>
+            <option value="last_year" {% if filter_option == 'last_year' %}selected{% endif %}>Last Year</option>
+            <option value="custom" {% if filter_option == 'custom' %}selected{% endif %}>Custom Range</option>
+        </select>
+    </div>
+
+    <!-- Custom Date Range Fields -->
+    <div id="custom-date-range" class="flex flex-col sm:flex-row gap-4 items-center" style="display: {% if filter_option == 'custom' %}flex{% else %}none{% endif %};">
+        <div>
+            <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" value="{{ request.GET.start_date }}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+            <label for="end_date" class="block text-sm font-medium text-gray-700">End Date:</label>
+            <input type="date" id="end_date" name="end_date" value="{{ request.GET.end_date }}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+    </div>
+
+    <button type="submit" class="py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Apply</button>
+</form>
+
+<script>
+    document.querySelector('#filter').addEventListener('change', function() {
+        const customDateRange = document.getElementById('custom-date-range');
+        customDateRange.style.display = this.value === 'custom' ? 'flex' : 'none';
+    });
+</script>
