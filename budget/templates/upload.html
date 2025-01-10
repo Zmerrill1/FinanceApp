@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Upload Transactions CSV{% endblock %}
 
@@ -36,6 +36,36 @@
                     {% endif %}
                 </div>
             {% endfor %}
+
+            <!-- Field for specifying if the CSV has headers -->
+            <div class="mb-4">
+                {{ form.has_header.label_tag }}
+                <div class="mt-1">
+                    {{ form.has_header }}
+                </div>
+            </div>
+
+            <!-- Fields for specifying column indices for date, amount, description, visible only when "Has Header" is unchecked -->
+            <div id="column-index-container" class="space-y-4" style="display: {% if not form.has_header.value %}block{% else %}none{% endif %};">
+                <div class="mb-4">
+                    {{ form.date_column.label_tag }}
+                    <div class="mt-1">
+                        {{ form.date_column }}
+                    </div>
+                </div>
+                <div class="mb-4">
+                    {{ form.amount_column.label_tag }}
+                    <div class="mt-1">
+                        {{ form.amount_column }}
+                    </div>
+                </div>
+                <div class="mb-4">
+                    {{ form.description_column.label_tag }}
+                    <div class="mt-1">
+                        {{ form.description_column }}
+                    </div>
+                </div>
+            </div>
         </div>
 
         <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
@@ -43,4 +73,26 @@
         </button>
     </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const hasHeaderCheckbox = document.querySelector('input[name="has_header"]');
+        const columnIndexContainer = document.getElementById("column-index-container");
+
+        // Function to toggle column index fields visibility
+        function toggleColumnIndexFields() {
+            if (hasHeaderCheckbox.checked) {
+                columnIndexContainer.style.display = "none";  // Hide fields if "Has Header" is checked
+            } else {
+                columnIndexContainer.style.display = "block"; // Show fields if "Has Header" is unchecked
+            }
+        }
+
+        // Attach event listener to toggle visibility when checkbox changes
+        hasHeaderCheckbox.addEventListener("change", toggleColumnIndexFields);
+
+        // Initial state check
+        toggleColumnIndexFields();
+    });
+</script>
 {% endblock %}

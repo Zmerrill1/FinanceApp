@@ -6,6 +6,29 @@ from .models import Account, Budget, BudgetItem, Transaction
 class CSVUploadForm(forms.Form):
     file = forms.FileField(label="Upload a CSV file")
     account = forms.ModelChoiceField(queryset=Account.objects.all())
+    has_header = forms.BooleanField(
+        required=False, initial=True, label="Does the CSV have a header?"
+    )
+    date_column = forms.IntegerField(
+        required=False,
+        min_value=0,
+        label="Column Index (0-based) for Date",
+        help_text="Specify which column contains the date data.",
+    )
+
+    amount_column = forms.IntegerField(
+        required=False,
+        min_value=0,
+        label="Column Index (0-based) for Amount",
+        help_text="Specify which column contains the amount data.",
+    )
+
+    description_column = forms.IntegerField(
+        required=False,
+        min_value=0,
+        label="Column Index (0-based) for Description",
+        help_text="Specify which column contains the description datar.",
+    )
 
 
 class TransactionForm(forms.ModelForm):

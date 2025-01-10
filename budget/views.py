@@ -73,14 +73,28 @@ def upload_csv(request):
         if form.is_valid():
             csv_file = request.FILES["file"]
             account = form.cleaned_data["account"]
+            has_header = form.cleaned_data["has_header"]
+            date_column = form.cleaned_data["date_column"]
+            amount_column = form.cleaned_data["amount_column"]
+            description_column = form.cleaned_data["description_column"]
 
             csv_data = csv_file.read().decode("utf-8")
             io_string = io.StringIO(csv_data)
-            reader = csv.DictReader(io_string, delimiter=",")
-            file_hash = calculate_file_hash(csv_file)
 
+            # if has_header:
+            #     reader = csv.DictReader(io_string, delimiter=",")
+            # else:
+            #     reader = csv.reader(io_string, delimiter=",")
+            #     if None in (date_column, amount_column, description_column):
+            #         messages.error(
+            #             request,
+            #             "For files without headers, pleasy specify the column index containing the data.",
+            #         )
+            #         return render(request, "upload.html", {"form": form})
+
+            file_hash = calculate_file_hash(csv_file)
             if UploadedFile.objects.filter(file_hash=file_hash).exists():
-                messages.error(request, "This file has alrady been uploaded.")
+                messages.error(request, "This file has already been uploaded.")
                 return render(request, "upload.html", {"form": form})
 
             UploadedFile.objects.create(
@@ -90,28 +104,77 @@ def upload_csv(request):
             )
 
             transactions = []
+            if has_header:
+                reader = csv.DictReader(io_string, delimiter=",")
+                for row in reader:
+                    transaction_date = parse_date(row["Transaction Date"])
+                    amount = parse_amount(row["Amount"])
+                    description = row["Description"]
 
-            for row in reader:
-                transaction_date = parse_date(row["Transaction Date"])
-                amount = parse_amount(row["Amount"])
+                    if amount < 0:
+                        amount = abs(amount)
+                        transaction_type = "Expense"
+                    else:
+                        transaction_type = "Income"
 
-                if amount < 0:
-                    amount = abs(amount)
-                    transaction_type = "Expense"
-                else:
-                    transaction_type = "Income"
-
-                transactions.append(
-                    Transaction(
+                    transaction = Transaction(
                         account=account,
                         date=transaction_date,
-                        description=row["Description"],
+                        description=description,
                         amount=amount,
                         transaction_type=transaction_type,
                     )
-                )
 
-            Transaction.objects.bulk_create(transactions)
+                    print(
+                        f"Trasaction: {transaction.account}, {transaction.date}, {transaction.amount}, {transaction.transaction_type}"
+                    )
+
+                    transactions.append(transaction)
+
+            else:
+                reader = csv.reader(io_string, delimiter=",")
+                # Process the file without headers, using the specified columns
+                for row in reader:
+                    try:
+                        transaction_date = parse_date(row[date_column])
+                        print(transaction_date)
+                        amount = parse_amount(row[amount_column])
+                        print(amount)
+                        description = row[description_column]
+                        print(description)
+
+                        if amount < 0:
+                            amount = abs(amount)
+                            transaction_type = "EXPENSE"
+                        else:
+                            transaction_type = "INCOME"
+
+                        transaction = Transaction(
+                            account=account,
+                            date=transaction_date,
+                            description=description,
+                            amount=amount,
+                            transaction_type=transaction_type,
+                        )
+
+                        transactions.append(transaction)
+                    except IndexError:
+                        messages.error(
+                            request, f"Row {row} does not have enough columns."
+                        )
+                        continue
+            for transaction in transactions:
+                try:
+                    print(
+                        f"Saving transaction: {transaction.account}, {transaction.date}, {transaction.amount}, {transaction.transaction_type}"
+                    )
+                    transaction.save()
+                    print(f"Transaction saved: {transaction.id}")
+                except Exception as e:
+                    print(f"Error saving transaction: {e}")
+                    messages.error(request, f"Failed to save transaction: {e}")
+
+            # Transaction.objects.bulk_create(transactions)
             messages.success(
                 request,
                 f"CSV files uploaded and processed {len(transactions)} successfully",

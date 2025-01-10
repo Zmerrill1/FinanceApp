@@ -49,7 +49,9 @@ class Transaction(models.Model):
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField(default=now)
-    transaction_type = models.CharField(max_length=7, choices=TRANSACTION_TYPE)
+    transaction_type = models.CharField(
+        max_length=7, choices=TRANSACTION_TYPE, default="INCOME"
+    )
     description = models.TextField(blank=True, null=True)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     budget_item = models.ForeignKey(
