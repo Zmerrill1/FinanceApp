@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Account, Budget, BudgetItem, Transaction
+from .models import Account, Budget, BudgetItem, Transaction, UploadedFile
 
 
 @admin.register(Budget)
@@ -34,3 +34,8 @@ class TransactionAdmin(admin.ModelAdmin):
     )
     search_fields = ("date", "transaction_type", "account", "budget_ite ")
     list_filter = ("date", "transaction_type", "account", "budget_item")
+
+
+@admin.register(UploadedFile)
+class UploadedFileAmin(admin.ModelAdmin):
+    pass

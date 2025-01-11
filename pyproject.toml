@@ -8,4 +8,5 @@ dependencies = [
     "django-debug-toolbar>=4.4.6",
     "django>=5.1.4",
     "python-decouple>=3.8",
+    "django-allauth>=65.3.1",
 ]

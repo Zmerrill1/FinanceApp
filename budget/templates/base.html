@@ -46,24 +46,11 @@
                         </li>
 
                         <!-- Authentication Links -->
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a href="{% url 'logout' %}" class="hover:text-blue-300 transition-colors">
-                                    Logout
-                                </a>
-                            </li>
-                        {% else %}
-                            <li>
-                                <a href="{% url 'signup' %}" class="hover:text-blue-300 transition-colors">
-                                    Sign Up
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'login' %}" class="hover:text-blue-300 transition-colors">
-                                    Login
-                                </a>
-                            </li>
-                        {% endif %}
+                            {% if user.is_authenticated %}
+                    <a href="{% url 'account_logout' %}" class="mx-2 hover:bg-gray-100 dark:hover:bg-gray-900">Logout</a>
+                    {% else %}
+                    <a id="login-link" href="{% url 'account_login' %}" class="mx-2 hover:bg-gray-100 dark:hover:bg-gray-900">Login</a>
+                    {% endif %}
                     </ul>
                 </nav>
             </div>
