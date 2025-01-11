@@ -113,9 +113,9 @@ def upload_csv(request):
 
                     if amount < 0:
                         amount = abs(amount)
-                        transaction_type = "EXPENSE"
+                        transaction_type = "Expense"
                     else:
-                        transaction_type = "INCOME"
+                        transaction_type = "Income"
 
                     transaction = Transaction(
                         account=account,

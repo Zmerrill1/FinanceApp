@@ -25,16 +25,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-allauth"
-version = "65.3.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "asgiref" },
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/20/73/3a24b32df7046c5106846c0cfb3309033e2ebe00b08dfbf64c883add253a/django_allauth-65.3.1.tar.gz", hash = "sha256:e02e951b71a2753a746459f2efa114c7c72bf2cef6887dbe8607a577c0350587", size = 1547530 }
-
-[[package]]
 name = "django-debug-toolbar"
 version = "4.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -53,7 +43,6 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
-    { name = "django-allauth" },
     { name = "django-debug-toolbar" },
     { name = "python-decouple" },
 ]
@@ -61,7 +50,6 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = ">=5.1.4" },
-    { name = "django-allauth", specifier = ">=65.3.1" },
     { name = "django-debug-toolbar", specifier = ">=4.4.6" },
     { name = "python-decouple", specifier = ">=3.8" },
 ]
