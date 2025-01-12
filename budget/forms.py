@@ -7,8 +7,9 @@ class CSVUploadForm(forms.Form):
     file = forms.FileField(label="Upload a CSV file")
     account = forms.ModelChoiceField(queryset=Account.objects.all())
     has_header = forms.BooleanField(
-        required=False, initial=True, label="Does the CSV have a header?"
+        required=True, label="Does the CSV file have a header?", initial=True
     )
+
     date_column = forms.IntegerField(
         required=False,
         min_value=0,

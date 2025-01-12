@@ -5,8 +5,6 @@ from datetime import date, datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.views import LoginView
 from django.db.models import Case, DecimalField, F, Q, Sum, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import make_aware
@@ -19,21 +17,6 @@ from .forms import (
     TransactionForm,
 )
 from .models import Account, Budget, BudgetItem, Transaction, UploadedFile
-
-
-def signup(request):
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("login")
-    else:
-        form = UserCreationForm()
-    return render(request, "signup.html", {"form": form})
-
-
-class CustomLoginView(LoginView):
-    template_name = "login.html"
 
 
 def parse_date(date_str: str) -> date:
@@ -64,13 +47,105 @@ def calculate_file_hash(file) -> str:
     return hasher.hexdigest()
 
 
+def save_transactions(transactions):
+    """
+    Save a list of Transaction objects to the database.
+    """
+    Transaction.objects.bulk_create(transactions)
+
+
+def parse_transaction_row(
+    row, account, date_column, amount_column, description_column, header=True
+):
+    """
+    Parse a row and return a Transaction object, or None if invalid.
+    """
+    try:
+        if header:
+            transaction_date = parse_date(row[date_column])
+            amount = parse_amount(row[amount_column])
+            description = row[description_column]
+        else:
+            transaction_date = parse_date(row[int(date_column)])
+            amount = parse_amount(row[int(amount_column)])
+            description = row[int(description_column)]
+
+        transaction_type = "EXPENSE" if amount < 0 else "INCOME"
+        amount = abs(amount)
+
+        return Transaction(
+            account=account,
+            date=transaction_date,
+            description=description,
+            amount=amount,
+            transaction_type=transaction_type,
+        )
+    except (ValueError, KeyError, IndexError):
+        # Log or handle parsing errors as needed
+        return None
+
+
+def process_csv_file(csv_file, account, date_column, amount_column, description_column):
+    """
+    Process CSV file and return a list of Transaction objects.
+    """
+    csv_file.seek(0)
+
+    csv_data = csv_file.read(512).decode("utf-8")
+    io_string = io.StringIO(csv_data)
+
+    sniffer = csv.Sniffer()
+    delimiter = sniffer.sniff(csv_data).delimiter
+    csv_file.seek(0)
+
+    transactions = []
+    has_header = sniffer.has_header(csv_data)
+
+    if has_header:
+        reader = csv.DictReader(io_string, delimiter=delimiter)
+        for row in reader:
+            transaction = parse_transaction_row(
+                row, account, "Transaction Date", "Amount", "Description"
+            )
+            if transaction:
+                transactions.append(transaction)
+    else:
+        reader = csv.reader(io_string, delimiter=",")
+        for row in reader:
+            try:
+                transaction = parse_transaction_row(
+                    row,
+                    account,
+                    date_column,
+                    amount_column,
+                    description_column,
+                    header=False,
+                )
+                if transaction:
+                    transactions.append(transaction)
+            except IndexError:
+                continue  # Skip rows with insufficient columns
+
+    return transactions, has_header
+
+
+def detect_csv_header(csv_file):
+    sniffer = csv.Sniffer()
+    csv_data = csv_file.read(512).decode("utf-8")
+    has_header = sniffer.has_header(csv_data)
+    csv_file.seek(0)
+    return has_header
+
+
 @login_required
 def upload_csv(request):
     form = CSVUploadForm()
+
     if request.method == "POST":
         form = CSVUploadForm(request.POST, request.FILES)
 
         if form.is_valid():
+            # Extract form data
             csv_file = request.FILES["file"]
             account = form.cleaned_data["account"]
             has_header = form.cleaned_data["has_header"]
@@ -78,109 +153,143 @@ def upload_csv(request):
             amount_column = form.cleaned_data["amount_column"]
             description_column = form.cleaned_data["description_column"]
 
-            csv_data = csv_file.read().decode("utf-8")
-            io_string = io.StringIO(csv_data)
+            # has_header = detect_csv_header(csv_file)
 
-            # if has_header:
-            #     reader = csv.DictReader(io_string, delimiter=",")
-            # else:
-            #     reader = csv.reader(io_string, delimiter=",")
-            #     if None in (date_column, amount_column, description_column):
-            #         messages.error(
-            #             request,
-            #             "For files without headers, pleasy specify the column index containing the data.",
-            #         )
-            #         return render(request, "upload.html", {"form": form})
-
-            file_hash = calculate_file_hash(csv_file)
-            if UploadedFile.objects.filter(file_hash=file_hash).exists():
-                messages.error(request, "This file has already been uploaded.")
-                return render(request, "upload.html", {"form": form})
-
-            UploadedFile.objects.create(
-                file_name=csv_file.name,
-                file_hash=file_hash,
-                user=request.user,
-            )
-
-            transactions = []
-            if has_header:
-                reader = csv.DictReader(io_string, delimiter=",")
-                for row in reader:
-                    transaction_date = parse_date(row["Transaction Date"])
-                    amount = parse_amount(row["Amount"])
-                    description = row["Description"]
-
-                    if amount < 0:
-                        amount = abs(amount)
-                        transaction_type = "EXPENSE"
-                    else:
-                        transaction_type = "INCOME"
-
-                    transaction = Transaction(
-                        account=account,
-                        date=transaction_date,
-                        description=description,
-                        amount=amount,
-                        transaction_type=transaction_type,
+            # If no header is detected, we proceed to handle the indices
+            if not has_header:
+                if date_column and amount_column and description_column:
+                    # Process the CSV data using the user-specified column indices
+                    transactions, _ = process_csv_file(
+                        csv_file,
+                        account,
+                        date_column,
+                        amount_column,
+                        description_column,
+                    )
+                    save_transactions(transactions)
+                    messages.success(
+                        request,
+                        f"CSV file uploaded and {len(transactions)} transactions processed successfully.",
+                    )
+                    # Treat the file as having headers now after processing with indices
+                    has_header = True  # Set to True as we are processing the file now with indices
+                    return render(
+                        request, "upload.html", {"form": form, "has_header": False}
                     )
 
-                    print(
-                        f"Trasaction: {transaction.account}, {transaction.date}, {transaction.amount}, {transaction.transaction_type}"
+                else:
+                    # If no indices are provided, ask for the column indices
+                    messages.warning(
+                        request,
+                        "No headers detected in your CSV file. Please specify the column indices.",
                     )
-
-                    transactions.append(transaction)
+                    return render(
+                        request, "upload.html", {"form": form, "has_header": False}
+                    )
 
             else:
-                reader = csv.reader(io_string, delimiter=",")
-                # Process the file without headers, using the specified columns
-                for row in reader:
-                    try:
-                        transaction_date = parse_date(row[date_column])
-                        print(transaction_date)
-                        amount = parse_amount(row[amount_column])
-                        print(amount)
-                        description = row[description_column]
-                        print(description)
-
-                        if amount < 0:
-                            amount = abs(amount)
-                            transaction_type = "EXPENSE"
-                        else:
-                            transaction_type = "INCOME"
-
-                        transaction = Transaction(
-                            account=account,
-                            date=transaction_date,
-                            description=description,
-                            amount=amount,
-                            transaction_type=transaction_type,
-                        )
-
-                        transactions.append(transaction)
-                    except IndexError:
-                        messages.error(
-                            request, f"Row {row} does not have enough columns."
-                        )
-                        continue
-            for transaction in transactions:
-                try:
-                    print(
-                        f"Saving transaction: {transaction.account}, {transaction.date}, {transaction.amount}, {transaction.transaction_type}"
+                # If headers exist, proceed with checking for duplicates and processing
+                file_hash = calculate_file_hash(csv_file)
+                if UploadedFile.objects.filter(file_hash=file_hash).exists():
+                    messages.error(request, "This file has already been uploaded.")
+                    return render(
+                        request, "upload.html", {"form": form, "has_header": True}
                     )
-                    transaction.save()
-                    print(f"Transaction saved: {transaction.id}")
+
+                # Save uploaded file metadata
+                UploadedFile.objects.create(
+                    file_name=csv_file.name,
+                    file_hash=file_hash,
+                    user=request.user,
+                )
+
+                try:
+                    # Process the CSV data if headers are detected
+                    transactions, _ = process_csv_file(
+                        csv_file,
+                        account,
+                        date_column,
+                        amount_column,
+                        description_column,
+                    )
+                    save_transactions(transactions)
+                    messages.success(
+                        request,
+                        f"CSV file uploaded and {len(transactions)} transactions processed successfully.",
+                    )
+                    return render(
+                        request, "upload.html", {"form": form, "has_header": True}
+                    )
+
                 except Exception as e:
-                    print(f"Error saving transaction: {e}")
-                    messages.error(request, f"Failed to save transaction: {e}")
+                    messages.error(request, f"Error processing CSV: {e}")
 
-            # Transaction.objects.bulk_create(transactions)
-            messages.success(
-                request,
-                f"CSV files uploaded and processed {len(transactions)} successfully",
-            )
+    return render(request, "upload.html", {"form": form, "has_header": False})
 
-    return render(request, "upload.html", {"form": form})
+
+# def upload_csv(request):
+#     form = CSVUploadForm()
+
+#     if request.method == "POST":
+#         form = CSVUploadForm(request.POST, request.FILES)
+
+#         if form.is_valid():
+#             # Extract form data
+#             csv_file = request.FILES["file"]
+#             account = form.cleaned_data["account"]
+#             date_column = form.cleaned_data["date_column"]
+#             amount_column = form.cleaned_data["amount_column"]
+#             description_column = form.cleaned_data["description_column"]
+
+#             has_header = detect_csv_header(csv_file)
+
+#             if not has_header:
+#                 if date_column and amount_column and description_column:
+#                     transactions, _ = process_csv_file(
+#                     csv_file, account, date_column, amount_column, description_column
+#                 )
+#                     save_transactions(transactions)
+#                     messages.success(
+#                         request,
+#                         f"CSV file uploaded and {len(transactions)} transactions processed successfully.",
+#                     )
+#                     has_header = True
+#                     return render(request, "upload.html", {"form": form, "has_header": has_header})
+#                 else:
+#                     #no header detected and no indices provided, ask for the column indices
+#                     messages.warning(request, "No headers detected in your CSV file. Please specify the column indices.")
+#                     return render(request, "upload.html", {"form": form, "has_header": "false"})
+
+#             # Calculate hash and check for duplicates
+#             file_hash = calculate_file_hash(csv_file)
+#             if UploadedFile.objects.filter(file_hash=file_hash).exists():
+#                 messages.error(request, "This file has already been uploaded.")
+#                 return render(request, "upload.html", {"form": form, "has_header": "false"})
+
+#             # Save uploaded file metadata
+#             UploadedFile.objects.create(
+#                 file_name=csv_file.name,
+#                 file_hash=file_hash,
+#                 user=request.user,
+#             )
+
+#             try:
+#                 #Process the CSV data based on whether it has a heade
+#                 transactions, _ = process_csv_file(
+#                 csv_file, account, date_column, amount_column, description_column
+#             )
+#                 save_transactions(transactions)
+#                 messages.success(
+#                     request,
+#                     f"CSV file uploaded and {len(transactions)} transactions processed successfully.",
+#                 )
+
+#                 return render(request, "upload.html", {"form": form, "has_header": has_header})
+
+#             except Exception as e:
+#                 messages.error(request, f"Error processing CSV: {e}")
+
+#     return render(request, "upload.html", {"form": form, "has_header": "false"})
 
 
 @login_required
@@ -223,15 +332,23 @@ def delete_transaction(request, transaction_id):
 
 @login_required
 def transaction_list(request):
-    transactions = Transaction.objects.all()
-    budget_item = BudgetItem.objects.all()
+    today = datetime.today()
+    filter_option = request.GET.get("filter", "this_month")
+    start_date, end_date = get_date_range(filter_option, request, today)
+
+    date_filter = Q()
+    if start_date and end_date:
+        date_filter = Q(date__range=(start_date, end_date))
+
+    transactions = Transaction.objects.all().filter(date_filter).order_by("-date")
+    budget_items = BudgetItem.objects.all()
 
     if request.method == "POST":
         transaction_id = request.POST.get("transaction_id")
         budget_item_id = request.POST.get("budget_item_id")
         if transaction_id and budget_item_id:
             transaction = Transaction.objects.get(id=transaction_id)
-            budget_item = BudgetItem.objects.get(id=budget_item_id)
+            budget_item: BudgetItem = BudgetItem.objects.get(id=budget_item_id)
             transaction.budget_item = budget_item
             transaction.save()
             return redirect("transaction_list")
@@ -239,7 +356,11 @@ def transaction_list(request):
     return render(
         request,
         "transaction_list.html",
-        {"transactions": transactions, "budget_item": budget_item},
+        {
+            "transactions": transactions,
+            "budget_items": budget_items,
+            "filter_option": filter_option,
+        },
     )
 
 

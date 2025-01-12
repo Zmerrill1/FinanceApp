@@ -1,5 +1,4 @@
-from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import path
+from django.urls import include, path
 
 from . import views
 
@@ -40,7 +39,5 @@ urlpatterns = [
         views.delete_budget_item,
         name="delete_budget_item",
     ),
-    path("signup/", views.signup, name="signup"),
-    path("login/", LoginView.as_view(template_name="login.html"), name="login"),
-    path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
+    path("accounts/", include("allauth.urls")),
 ]
