@@ -3,7 +3,8 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    path("", views.dashboard, name="dashboard"),
+    path("", views.home, name="home"),
+    path("dashboard/", views.dashboard, name="dashboard"),
     path("list/", views.transaction_list, name="transaction_list"),
     path("add/", views.add_transaction, name="add_transaction"),
     path("edit/<int:transaction_id>/", views.edit_transaction, name="edit_transaction"),

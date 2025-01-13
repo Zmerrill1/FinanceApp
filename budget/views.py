@@ -19,6 +19,12 @@ from .forms import (
 from .models import Account, Budget, BudgetItem, Transaction, UploadedFile
 
 
+def home(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+    return render(request, "home.html")
+
+
 def parse_date(date_str: str) -> date:
     return datetime.strptime(date_str, "%m/%d/%Y").date()
 
@@ -225,71 +231,6 @@ def upload_csv(request):
                     messages.error(request, f"Error processing CSV: {e}")
 
     return render(request, "upload.html", {"form": form, "has_header": False})
-
-
-# def upload_csv(request):
-#     form = CSVUploadForm()
-
-#     if request.method == "POST":
-#         form = CSVUploadForm(request.POST, request.FILES)
-
-#         if form.is_valid():
-#             # Extract form data
-#             csv_file = request.FILES["file"]
-#             account = form.cleaned_data["account"]
-#             date_column = form.cleaned_data["date_column"]
-#             amount_column = form.cleaned_data["amount_column"]
-#             description_column = form.cleaned_data["description_column"]
-
-#             has_header = detect_csv_header(csv_file)
-
-#             if not has_header:
-#                 if date_column and amount_column and description_column:
-#                     transactions, _ = process_csv_file(
-#                     csv_file, account, date_column, amount_column, description_column
-#                 )
-#                     save_transactions(transactions)
-#                     messages.success(
-#                         request,
-#                         f"CSV file uploaded and {len(transactions)} transactions processed successfully.",
-#                     )
-#                     has_header = True
-#                     return render(request, "upload.html", {"form": form, "has_header": has_header})
-#                 else:
-#                     #no header detected and no indices provided, ask for the column indices
-#                     messages.warning(request, "No headers detected in your CSV file. Please specify the column indices.")
-#                     return render(request, "upload.html", {"form": form, "has_header": "false"})
-
-#             # Calculate hash and check for duplicates
-#             file_hash = calculate_file_hash(csv_file)
-#             if UploadedFile.objects.filter(file_hash=file_hash).exists():
-#                 messages.error(request, "This file has already been uploaded.")
-#                 return render(request, "upload.html", {"form": form, "has_header": "false"})
-
-#             # Save uploaded file metadata
-#             UploadedFile.objects.create(
-#                 file_name=csv_file.name,
-#                 file_hash=file_hash,
-#                 user=request.user,
-#             )
-
-#             try:
-#                 #Process the CSV data based on whether it has a heade
-#                 transactions, _ = process_csv_file(
-#                 csv_file, account, date_column, amount_column, description_column
-#             )
-#                 save_transactions(transactions)
-#                 messages.success(
-#                     request,
-#                     f"CSV file uploaded and {len(transactions)} transactions processed successfully.",
-#                 )
-
-#                 return render(request, "upload.html", {"form": form, "has_header": has_header})
-
-#             except Exception as e:
-#                 messages.error(request, f"Error processing CSV: {e}")
-
-#     return render(request, "upload.html", {"form": form, "has_header": "false"})
 
 
 @login_required

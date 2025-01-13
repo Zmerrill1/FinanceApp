@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main class="container mx-auto mt-12 px-4">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-lg py-12 px-6">
+        <h1 class="text-5xl font-extrabold mb-6 text-center">Take Control of Your Finances</h1>
+        <p class="text-xl font-light mb-8 text-center">
+            Simplify your financial management. Track income, expenses, and budgets in one place. Start today and achieve your goals!
+        </p>
+        <!-- Centered buttons -->
+        <div class="flex justify-center space-x-4">
+            <a href="{% url 'account_signup' %}" class="bg-white text-blue-600 font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition-all">
+                Get Started
+            </a>
+            <a href="{% url 'account_login' %}" class="bg-blue-700 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-blue-800 transition-all">
+                Log In
+            </a>
+        </div>
+    </div>
+
+    <section class="mt-16">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Why Choose FinTrack?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h3 class="text-xl font-semibold text-blue-600 mb-4">Track Expenses</h3>
+                <p class="text-gray-600">
+                    Gain insight into your spending habits with easy-to-use expense tracking tools.
+                </p>
+            </div>
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h3 class="text-xl font-semibold text-indigo-600 mb-4">Set Budgets</h3>
+                <p class="text-gray-600">
+                    Stay on top of your finances by creating and managing budgets that work for you.
+                </p>
+            </div>
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h3 class="text-xl font-semibold text-green-600 mb-4">Plan Ahead</h3>
+                <p class="text-gray-600">
+                    Use our tools to plan for big purchases, save for goals, and secure your future.
+                </p>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
