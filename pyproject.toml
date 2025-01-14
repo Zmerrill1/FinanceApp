@@ -5,8 +5,16 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "django-debug-toolbar>=4.4.6",
     "django>=5.1.4",
+    "django-debug-toolbar>=4.4.6",
     "python-decouple>=3.8",
     "django-allauth>=65.3.1",
+    "django-tailwind>=3.8.0",
+    "django-widget-tweaks>=1.5.0",
+    "psycopg2-binary>=2.9.10",
+    "dj-database-url>=2.3.0",
+    "sqlparse>=0.5.3",
+    "gunicorn>=23.0.0",
+    "django-heroku>=0.3.1",
+    "whitenoise>=6.8.2",
 ]
