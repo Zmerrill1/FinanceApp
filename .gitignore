@@ -165,3 +165,7 @@ cython_debug/
 .env
 
 node_modules/
+
+static/
+
+staticfiles/
