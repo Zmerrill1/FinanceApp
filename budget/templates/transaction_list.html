@@ -6,6 +6,8 @@
     <div class="max-w-6xl mx-auto p-4">
         <h1 class="text-3xl font-semibold text-gray-800 mb-6">Transaction List</h1>
 
+        {% include "filter_form.html" with filter_option=request.GET.filter %}
+
         <a href="{% url 'add_transaction' %}" class="mb-4 inline-block px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Add New Transaction</a>
 
         {% if transactions %}
@@ -17,8 +19,8 @@
                             <th class="px-6 py-3 font-medium text-gray-600">Description</th>
                             <th class="px-6 py-3 font-medium text-gray-600">Amount</th>
                             <th class="px-6 py-3 font-medium text-gray-600">Category</th>
+                            <th class="px-6 py-3 font-medium text-gray-600">Assign Category</th>
                             <th class="px-6 py-3 font-medium text-gray-600">Actions</th>
-                            <th class="px-6 py-3 font-medium text-gray-600">Assign Budget</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,11 +29,7 @@
                                 <td class="px-6 py-4">{{ transaction.date }}</td>
                                 <td class="px-6 py-4">{{ transaction.description }}</td>
                                 <td class="px-6 py-4">{{ transaction.amount }}</td>
-                                <td class="px-6 py-4">{{ transaction.budget_item.budget_category }}</td>
-                                <td class="px-6 py-4">
-                                    <a href="{% url 'edit_transaction' transaction.id %}" class="text-blue-500 hover:text-blue-700">Edit</a> |
-                                    <a href="{% url 'delete_transaction' transaction.id %}" class="text-red-500 hover:text-red-700" onclick="return confirm('Are you sure?')">Delete</a>
-                                </td>
+                                <td class="px-6 py-4">{{ transaction.budget_item }}</td>
                                 <td class="px-6 py-4">
                                     <form method="POST" class="flex space-x-2 items-center">
                                         {% csrf_token %}
@@ -39,13 +37,17 @@
                                         <select name="budget_item_id" class="py-2 px-4 border border-gray-300 rounded-md">
                                             <option value="">--Select Budget Item--</option>
                                             {% for budget_item in budget_items %}
-                                                <option value="{{ budget_item.id }}" {% if budget_item.id == transaction.budget_item.id %}selected{% endif %}>
-                                                    {{ budget_item.budget_category }}
+                                                <option value="{{ budget_item.id }}" {% if budget_item.id == budget_item %}selected{% endif %}>
+                                                    {{ budget_item }}
                                                 </option>
                                             {% endfor %}
                                         </select>
                                         <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Assign</button>
                                     </form>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="{% url 'edit_transaction' transaction.id %}" class="text-blue-500 hover:text-blue-700">Edit</a> |
+                                    <a href="{% url 'delete_transaction' transaction.id %}" class="text-red-500 hover:text-red-700" onclick="return confirm('Are you sure?')">Delete</a>
                                 </td>
                             </tr>
                         {% endfor %}

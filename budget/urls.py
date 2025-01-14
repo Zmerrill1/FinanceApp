@@ -1,10 +1,10 @@
-from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import path
+from django.urls import include, path
 
 from . import views
 
 urlpatterns = [
-    path("", views.dashboard, name="dashboard"),
+    path("", views.home, name="home"),
+    path("dashboard/", views.dashboard, name="dashboard"),
     path("list/", views.transaction_list, name="transaction_list"),
     path("add/", views.add_transaction, name="add_transaction"),
     path("edit/<int:transaction_id>/", views.edit_transaction, name="edit_transaction"),
@@ -40,7 +40,5 @@ urlpatterns = [
         views.delete_budget_item,
         name="delete_budget_item",
     ),
-    path("signup/", views.signup, name="signup"),
-    path("login/", LoginView.as_view(template_name="login.html"), name="login"),
-    path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
+    path("accounts/", include("allauth.urls")),
 ]

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load widget_tweaks %}
 
 {% block title %}Upload Transactions CSV{% endblock %}
 
@@ -21,78 +22,68 @@
     <form method="post" enctype="multipart/form-data" class="space-y-4">
         {% csrf_token %}
         <div class="border border-gray-300 rounded-lg p-4 bg-white shadow-md">
-            {% for field in form %}
-                <div class="mb-4">
-                    {{ field.label_tag }}
-                    <div class="mt-1">
-                        {{ field }}
-                    </div>
-                    {% if field.errors %}
-                    <p class="text-red-500 text-sm mt-1">
-                        {% for error in field.errors %}
-                        {{ error }}<br>
-                        {% endfor %}
-                    </p>
-                    {% endif %}
-                </div>
-            {% endfor %}
-
-            <!-- Field for specifying if the CSV has headers -->
             <div class="mb-4">
-                {{ form.has_header.label_tag }}
+                <label class="block text-sm font-medium text-gray-700">{{ form.file.label }}</label>
                 <div class="mt-1">
-                    {{ form.has_header }}
+                    {{ form.file|add_class:"form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" }}
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">{{ form.account.label }}</label>
+                <div class="mt-1">
+                    {{ form.account|add_class:"form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" }}
                 </div>
             </div>
 
-            <!-- Fields for specifying column indices for date, amount, description, visible only when "Has Header" is unchecked -->
-            <div id="column-index-container" class="space-y-4" style="display: {% if not form.has_header.value %}block{% else %}none{% endif %};">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">{{ form.has_header.label }}</label>
+                <div class="mt-1">
+                    {{ form.has_header|add_class:"form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" }}
+                </div>
+                <small class="block mt-1 text-sm text-gray-500">
+                    If your file does not have a header, please uncheck and add the column indices below.
+                </small>
+            </div>
+
+            <!-- Column index fields, visible only when "Has Header" is unchecked -->
+            <div id="column-index-container" class="space-y-4 {% if has_header %}hidden{% endif %}">
                 <div class="mb-4">
-                    {{ form.date_column.label_tag }}
+                    <label class="block text-sm font-medium text-gray-700">{{ form.date_column.label }}</label>
                     <div class="mt-1">
-                        {{ form.date_column }}
+                        {{ form.date_column|add_class:"form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" }}
                     </div>
                 </div>
                 <div class="mb-4">
-                    {{ form.amount_column.label_tag }}
+                    <label class="block text-sm font-medium text-gray-700">{{ form.amount_column.label }}</label>
                     <div class="mt-1">
-                        {{ form.amount_column }}
+                        {{ form.amount_column|add_class:"form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" }}
                     </div>
                 </div>
                 <div class="mb-4">
-                    {{ form.description_column.label_tag }}
+                    <label class="block text-sm font-medium text-gray-700">{{ form.description_column.label }}</label>
                     <div class="mt-1">
-                        {{ form.description_column }}
+                        {{ form.description_column|add_class:"form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" }}
                     </div>
                 </div>
             </div>
         </div>
 
-        <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
-            Upload
-        </button>
+        <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Upload</button>
     </form>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const hasHeaderCheckbox = document.querySelector('input[name="has_header"]');
+        // Ensure that the `has_header` value is either true or false
+        const hasHeader = {{ has_header|yesno:"true,false" }};
         const columnIndexContainer = document.getElementById("column-index-container");
 
-        // Function to toggle column index fields visibility
-        function toggleColumnIndexFields() {
-            if (hasHeaderCheckbox.checked) {
-                columnIndexContainer.style.display = "none";  // Hide fields if "Has Header" is checked
-            } else {
-                columnIndexContainer.style.display = "block"; // Show fields if "Has Header" is unchecked
-            }
+        // Toggle the column index fields based on whether the CSV has headers or not
+        if (hasHeader) {
+            columnIndexContainer.classList.add("hidden");
+        } else {
+            columnIndexContainer.classList.remove("hidden");
         }
-
-        // Attach event listener to toggle visibility when checkbox changes
-        hasHeaderCheckbox.addEventListener("change", toggleColumnIndexFields);
-
-        // Initial state check
-        toggleColumnIndexFields();
     });
 </script>
 {% endblock %}

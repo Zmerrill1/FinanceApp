@@ -1,58 +1,63 @@
 {% load static %}
+{% load widget_tweaks %}
+{% load tags %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
-    <title>{% block title %}Finance App{% endblock %}</title>
+    <title>{% block title %}FinTrack{% endblock %}</title>
 </head>
 <body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
     <header class="bg-blue-600 text-white">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-bold">Finance App</h1>
-                <nav>
-                    <ul class="flex space-x-4">
-                        <li>
-                            <a href="{% url 'dashboard' %}" class="hover:text-blue-300 transition-colors">
-                                Dashboard
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'transaction_list' %}" class="hover:text-blue-300 transition-colors">
-                                Transactions
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'upload_csv' %}" class="hover:text-blue-300 transition-colors">
-                                Upload
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'bank_account_list' %}" class="hover:text-blue-300 transition-colors">
-                                Bank Accounts
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'budget_list' %}" class="hover:text-blue-300 transition-colors">
-                                Budgets
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'budget_item_list' %}" class="hover:text-blue-300 transition-colors">
-                                Budget Items
-                            </a>
-                        </li>
+                <h1 class="text-2xl font-bold">FinTrack</h1>
+                {% if user.is_authenticated %}
+                    <nav>
+                        <ul class="flex space-x-4">
+                            <li>
+                                <a href="{% url 'dashboard' %}" class="hover:text-blue-300 transition-colors">
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'transaction_list' %}" class="hover:text-blue-300 transition-colors">
+                                    Transactions
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'upload_csv' %}" class="hover:text-blue-300 transition-colors">
+                                    Upload
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'bank_account_list' %}" class="hover:text-blue-300 transition-colors">
+                                    Bank Accounts
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'budget_list' %}" class="hover:text-blue-300 transition-colors">
+                                    Budgets
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'budget_item_list' %}" class="hover:text-blue-300 transition-colors">
+                                    Budget Items
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'account_logout' %}" class="hover:text-blue-300 transition-colors">
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% else %}
 
-                        <!-- Authentication Links -->
-                            {% if user.is_authenticated %}
-                    <a href="{% url 'account_logout' %}" class="mx-2 hover:bg-gray-100 dark:hover:bg-gray-900">Logout</a>
-                    {% else %}
-                    <a id="login-link" href="{% url 'account_login' %}" class="mx-2 hover:bg-gray-100 dark:hover:bg-gray-900">Login</a>
-                    {% endif %}
-                    </ul>
-                </nav>
+                {% endif %}
             </div>
         </div>
     </header>
@@ -63,7 +68,7 @@
 
     <footer class="bg-gray-800 text-gray-400 text-center py-4">
         {% block footer %}
-        <p>&copy; 2025 Finance App</p>
+        <p>&copy; 2025 FinTrack</p>
         {% endblock %}
     </footer>
 </body>
