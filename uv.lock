@@ -112,6 +112,7 @@ dependencies = [
     { name = "psycopg2-binary" },
     { name = "python-decouple" },
     { name = "sqlparse" },
+    { name = "whitenoise" },
 ]
 
 [package.metadata]
@@ -127,6 +128,7 @@ requires-dist = [
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "python-decouple", specifier = ">=3.8" },
     { name = "sqlparse", specifier = ">=0.5.3" },
+    { name = "whitenoise", specifier = ">=6.8.2" },
 ]
 
 [[package]]
