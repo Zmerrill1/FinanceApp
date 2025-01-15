@@ -4,7 +4,7 @@ A web application to help you track your personal finances, manage budgets, and 
 
 ## Live Demo
 
-Check out the live application on Heroku: [Django Finance Project](https://fintrack-pdm-511a83ebf2da.herokuapp.com/)
+Check out the live application on Heroku: [FinTrack](https://fintrack-pdm-511a83ebf2da.herokuapp.com/)
 
 ## Table of Contents
 
