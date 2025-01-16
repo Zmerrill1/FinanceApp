@@ -26,6 +26,9 @@ Check out the live application on Heroku: [FinTrack](https://fintrack-pdm-511a83
 - **Dashboard**: Visualize financial insights, including spending summaries and budget performance.
 - **Responsive Design**: Built with TailwindCSS for a seamless experience on any device.
 
+![Dashboard Screenshot](screenshots/dashboard.png)
+![Transaction List Screenshot](screenshots/transaction_list.png)
+
 ## Installation
 
 To run this project locally, follow these steps:
