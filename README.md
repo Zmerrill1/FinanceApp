@@ -111,7 +111,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Acknowledgments
 
-- [PyBites PDM Program]([https://codechalleng.es/](https://pybit.es/python-certifications/pcpd-p/))
+- [PyBites PDM Program](https://pybit.es/catalogue/the-pdm-program/)
 - [Django Documentation](https://docs.djangoproject.com/)
 - [TailwindCSS Documentation](https://tailwindcss.com/docs)
 
