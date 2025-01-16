@@ -41,6 +41,7 @@ To run this project locally, follow these steps:
 3. Install dependencies using `uv`:
    ```bash
    uv sync
+   uv run
    ```
 4. Set up the database:
    ```bash
@@ -82,7 +83,7 @@ Ensure TailwindCSS is properly configured in your project to apply styles effect
 - **Framework**: Django
 - **Database**: PostgreSQL
 - **Frontend**: TailwindCSS
-- **Project Management**: Astral (`uv`)
+- **Project Management**: [Astral](https://docs.astral.sh/uv/) (`uv`)
 - **Deployment**: Heroku
 - **Python Version**: 3.13
 
@@ -117,5 +118,5 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-Feel free to suggest any improvements or share your feedback!
+Feel free to suggest any improvements or share your feedback by logging an issue against this repo!
 
