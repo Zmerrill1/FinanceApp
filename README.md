@@ -83,11 +83,11 @@ Ensure TailwindCSS is properly configured in your project to apply styles effect
 
 ## Technologies Used
 
-- **Framework**: Django
-- **Database**: PostgreSQL
-- **Frontend**: TailwindCSS
+- **Framework**: [Django](https://www.djangoproject.com)
+- **Database**: [PostgreSQL](https://www.postgresql.org)
+- **Frontend**: [TailwindCSS](https://tailwindcss.com)
 - **Project Management**: [Astral](https://docs.astral.sh/uv/) (`uv`)
-- **Deployment**: Heroku
+- **Deployment**: [Heroku](https://www.heroku.com)
 - **Python Version**: 3.13
 
 ## Contributing
